@@ -2,7 +2,7 @@
  * Copyright (C) 2016, Yagro, all right reserved.
  * File name:    USART.h
  * Date:         2016.03.22
- * Description:  USART Driver
+ * Description:  USART driver.
 *****************************************************************/
 
 #ifndef __USART_H
@@ -16,137 +16,264 @@
 /****************************************************************
  *                       Macro definition
 *****************************************************************/
-#define USART1_BufferSize_Tx  ((uint16_t)100)
-#define USART1_BufferSize_Rx  ((uint16_t)2048)
-
-#define USART2_BufferSize_Tx  ((uint16_t)1)
-#define USART2_BufferSize_Rx  ((uint16_t)1)
-
-#define USART3_BufferSize_Tx  ((uint16_t)1)
-#define USART3_BufferSize_Rx  ((uint16_t)1)
-
-#define USART4_BufferSize_Tx  ((uint16_t)1)
-#define USART4_BufferSize_Rx  ((uint16_t)1)
-
-#define USART5_BufferSize_Tx  ((uint16_t)1)
-#define USART5_BufferSize_Rx  ((uint16_t)1)
-
-#define USART6_BufferSize_Tx  ((uint16_t)1)
-#define USART6_BufferSize_Rx  ((uint16_t)1)
 
 /********************* USART1 Configuration *********************/
 
-#define RCC_AHB1Periph_USART1_Tx     RCC_AHB1Periph_GPIOA
-#define RCC_AHB1Periph_USART1_Rx     RCC_AHB1Periph_GPIOA
+#define USART1_BufferSize_Tx            (4096)
+#define USART1_BufferSize_Rx            (4096)
 
-#define GPIO_USART1_Tx               GPIOA
-#define GPIO_USART1_Rx               GPIOA
+#define USART1_DMA_BufferSize_Tx        (4096)
+#define USART1_DMA_BufferSize_Rx        (4096)
 
-#define GPIO_Pin_USART1_Tx           GPIO_Pin_9
-#define GPIO_Pin_USART1_Rx           GPIO_Pin_10
+#define USART1_IRQ_PreemptionPriority   (2)
+#define USART1_IRQ_SubPriority          (0)
 
-#define GPIO_PinSource_USART1_Tx     GPIO_PinSource9
-#define GPIO_PinSource_USART1_Rx     GPIO_PinSource10
+#define USART1_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOA
+#define USART1_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOA
+
+#define USART1_Tx_GPIO                  GPIOA
+#define USART1_Rx_GPIO                  GPIOA
+
+#define USART1_Tx_GPIO_Pin              GPIO_Pin_9
+#define USART1_Rx_GPIO_Pin              GPIO_Pin_10
+
+#define USART1_Tx_GPIO_PinSource        GPIO_PinSource9
+#define USART1_Rx_GPIO_PinSource        GPIO_PinSource10
 
 /****************************************************************/
 
 /********************* USART2 Configuration *********************/
 
-#define RCC_AHB1Periph_USART2_Tx     RCC_AHB1Periph_GPIOA
-#define RCC_AHB1Periph_USART2_Rx     RCC_AHB1Periph_GPIOA
+#define USART2_BufferSize_Tx            (0)
+#define USART2_BufferSize_Rx            (0)
 
-#define GPIO_USART2_Tx               GPIOA
-#define GPIO_USART2_Rx               GPIOA
+#define USART2_DMA_BufferSize_Tx        (0)
+#define USART2_DMA_BufferSize_Rx        (0)
 
-#define GPIO_Pin_USART2_Tx           GPIO_Pin_2
-#define GPIO_Pin_USART2_Rx           GPIO_Pin_3
+#define USART2_IRQ_PreemptionPriority   (0)
+#define USART2_IRQ_SubPriority          (0)
 
-#define GPIO_PinSource_USART2_Tx     GPIO_PinSource2
-#define GPIO_PinSource_USART2_Rx     GPIO_PinSource3
+#define USART2_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOA
+#define USART2_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOA
+
+#define USART2_Tx_GPIO                  GPIOA
+#define USART2_Rx_GPIO                  GPIOA
+
+#define USART2_Tx_GPIO_Pin              GPIO_Pin_2
+#define USART2_Rx_GPIO_Pin              GPIO_Pin_3
+
+#define USART2_Tx_GPIO_PinSource        GPIO_PinSource2
+#define USART2_Rx_GPIO_PinSource        GPIO_PinSource3
 
 /****************************************************************/
 
+#if defined(STM32F40_41xxx) || defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F469_479xx) || defined(STM32F446xx) || defined(STM32F412xG) || defined(STM32F413_423xx)
 /********************* USART3 Configuration *********************/
 
-#define RCC_AHB1Periph_USART3_Tx     RCC_AHB1Periph_GPIOB
-#define RCC_AHB1Periph_USART3_Rx     RCC_AHB1Periph_GPIOB
+#define USART3_BufferSize_Tx            (0)
+#define USART3_BufferSize_Rx            (0)
 
-#define GPIO_USART3_Tx               GPIOB
-#define GPIO_USART3_Rx               GPIOB
+#define USART3_DMA_BufferSize_Tx        (0)
+#define USART3_DMA_BufferSize_Rx        (0)
 
-#define GPIO_Pin_USART3_Tx           GPIO_Pin_10
-#define GPIO_Pin_USART3_Rx           GPIO_Pin_11
+#define USART3_IRQ_PreemptionPriority   (0)
+#define USART3_IRQ_SubPriority          (0)
 
-#define GPIO_PinSource_USART3_Tx     GPIO_PinSource10
-#define GPIO_PinSource_USART3_Rx     GPIO_PinSource11
+#define USART3_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOB
+#define USART3_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOB
+
+#define USART3_Tx_GPIO                  GPIOB
+#define USART3_Rx_GPIO                  GPIOB
+
+#define USART3_Tx_GPIO_Pin              GPIO_Pin_10
+#define USART3_Rx_GPIO_Pin              GPIO_Pin_11
+
+#define USART3_Tx_GPIO_PinSource        GPIO_PinSource10
+#define USART3_Rx_GPIO_PinSource        GPIO_PinSource11
 
 /****************************************************************/
+#endif /* STM32F40_41xxx || STM32F427_437xx || STM32F429_439xx || STM32F469_479xx || STM32F446xx || STM32F412xG || STM32F413_423xx */
 
+#if defined(STM32F40_41xxx) || defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F469_479xx) || defined(STM32F446xx) || defined(STM32F413_423xx)
 /********************* USART4 Configuration *********************/
 
-#define RCC_AHB1Periph_USART4_Tx     RCC_AHB1Periph_GPIOC
-#define RCC_AHB1Periph_USART4_Rx     RCC_AHB1Periph_GPIOC
+#define USART4_BufferSize_Tx            (0)
+#define USART4_BufferSize_Rx            (0)
 
-#define GPIO_USART4_Tx               GPIOC
-#define GPIO_USART4_Rx               GPIOC
+#define USART4_DMA_BufferSize_Tx        (0)
+#define USART4_DMA_BufferSize_Rx        (0)
 
-#define GPIO_Pin_USART4_Tx           GPIO_Pin_10
-#define GPIO_Pin_USART4_Rx           GPIO_Pin_11
+#define USART4_IRQ_PreemptionPriority   (0)
+#define USART4_IRQ_SubPriority          (0)
 
-#define GPIO_PinSource_USART4_Tx     GPIO_PinSource10
-#define GPIO_PinSource_USART4_Rx     GPIO_PinSource11
+#define USART4_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOC
+#define USART4_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOC
+
+#define USART4_Tx_GPIO                  GPIOC
+#define USART4_Rx_GPIO                  GPIOC
+
+#define USART4_Tx_GPIO_Pin              GPIO_Pin_10
+#define USART4_Rx_GPIO_Pin              GPIO_Pin_11
+
+#define USART4_Tx_GPIO_PinSource        GPIO_PinSource10
+#define USART4_Rx_GPIO_PinSource        GPIO_PinSource11
 
 /****************************************************************/
 
 /********************* USART5 Configuration *********************/
 
-#define RCC_AHB1Periph_USART5_Tx     RCC_AHB1Periph_GPIOC
-#define RCC_AHB1Periph_USART5_Rx     RCC_AHB1Periph_GPIOD
+#define USART5_BufferSize_Tx            (0)
+#define USART5_BufferSize_Rx            (0)
 
-#define GPIO_USART5_Tx               GPIOC
-#define GPIO_USART5_Rx               GPIOD
+#define USART5_DMA_BufferSize_Tx        (0)
+#define USART5_DMA_BufferSize_Rx        (0)
 
-#define GPIO_Pin_USART5_Tx           GPIO_Pin_12
-#define GPIO_Pin_USART5_Rx           GPIO_Pin_2
+#define USART5_IRQ_PreemptionPriority   (0)
+#define USART5_IRQ_SubPriority          (0)
 
-#define GPIO_PinSource_USART5_Tx     GPIO_PinSource12
-#define GPIO_PinSource_USART5_Rx     GPIO_PinSource2
+#define USART5_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOC
+#define USART5_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOD
+
+#define USART5_Tx_GPIO                  GPIOC
+#define USART5_Rx_GPIO                  GPIOD
+
+#define USART5_Tx_GPIO_Pin              GPIO_Pin_12
+#define USART5_Rx_GPIO_Pin              GPIO_Pin_2
+
+#define USART5_Tx_GPIO_PinSource        GPIO_PinSource12
+#define USART5_Rx_GPIO_PinSource        GPIO_PinSource2
 
 /****************************************************************/
+#endif /* STM32F40_41xxx || STM32F427_437xx || STM32F429_439xx || STM32F469_479xx || STM32F446xx || STM32F413_423xx */
 
 /********************* USART6 Configuration *********************/
 
-#define RCC_AHB1Periph_USART6_Tx     RCC_AHB1Periph_GPIOC
-#define RCC_AHB1Periph_USART6_Rx     RCC_AHB1Periph_GPIOC
+#define USART6_BufferSize_Tx            (0)
+#define USART6_BufferSize_Rx            (0)
 
-#define GPIO_USART6_Tx               GPIOC
-#define GPIO_USART6_Rx               GPIOC
+#define USART6_DMA_BufferSize_Tx        (0)
+#define USART6_DMA_BufferSize_Rx        (0)
 
-#define GPIO_Pin_USART6_Tx           GPIO_Pin_6
-#define GPIO_Pin_USART6_Rx           GPIO_Pin_7
+#define USART6_IRQ_PreemptionPriority   (0)
+#define USART6_IRQ_SubPriority          (0)
 
-#define GPIO_PinSource_USART6_Tx     GPIO_PinSource6
-#define GPIO_PinSource_USART6_Rx     GPIO_PinSource7
+#define USART6_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOC
+#define USART6_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOC
+
+#define USART6_Tx_GPIO                  GPIOC
+#define USART6_Rx_GPIO                  GPIOC
+
+#define USART6_Tx_GPIO_Pin              GPIO_Pin_6
+#define USART6_Rx_GPIO_Pin              GPIO_Pin_7
+
+#define USART6_Tx_GPIO_PinSource        GPIO_PinSource6
+#define USART6_Rx_GPIO_PinSource        GPIO_PinSource7
 
 /****************************************************************/
 
-#define USART_1 ((uint8_t)0x01)
-#define USART_2 ((uint8_t)0x02)
-#define USART_3 ((uint8_t)0x03)
-#define USART_4 ((uint8_t)0x04)
-#define USART_5 ((uint8_t)0x05)
-#define USART_6 ((uint8_t)0x06)
+#if defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F469_479xx) || defined(STM32F413_423xx)
+/********************* USART7 Configuration *********************/
 
-#define BAUD_RATE_2400      ((uint32_t)2400)
-#define BAUD_RATE_4800      ((uint32_t)4800)
-#define BAUD_RATE_9600      ((uint32_t)9600)
-#define BAUD_RATE_19200     ((uint32_t)19200)
-#define BAUD_RATE_38400     ((uint32_t)38400)
-#define BAUD_RATE_57600     ((uint32_t)57600)
-#define BAUD_RATE_115200    ((uint32_t)115200)
-#define BAUD_RATE_230400    ((uint32_t)230400)
-#define BAUD_RATE_460800    ((uint32_t)460800)
-#define BAUD_RATE_921600    ((uint32_t)921600)
+#define USART7_BufferSize_Tx            (0)
+#define USART7_BufferSize_Rx            (0)
+
+#define USART7_DMA_BufferSize_Tx        (0)
+#define USART7_DMA_BufferSize_Rx        (0)
+
+#define USART7_IRQ_PreemptionPriority   (0)
+#define USART7_IRQ_SubPriority          (0)
+
+#define USART7_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOE
+#define USART7_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOE
+
+#define USART7_Tx_GPIO                  GPIOE
+#define USART7_Rx_GPIO                  GPIOE
+
+#define USART7_Tx_GPIO_Pin              GPIO_Pin_8
+#define USART7_Rx_GPIO_Pin              GPIO_Pin_7
+
+#define USART7_Tx_GPIO_PinSource        GPIO_PinSource8
+#define USART7_Rx_GPIO_PinSource        GPIO_PinSource7
+
+/****************************************************************/
+
+/********************* USART8 Configuration *********************/
+
+#define USART8_BufferSize_Tx            (0)
+#define USART8_BufferSize_Rx            (0)
+
+#define USART8_DMA_BufferSize_Tx        (0)
+#define USART8_DMA_BufferSize_Rx        (0)
+
+#define USART8_IRQ_PreemptionPriority   (0)
+#define USART8_IRQ_SubPriority          (0)
+
+#define USART8_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOE
+#define USART8_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOE
+
+#define USART8_Tx_GPIO                  GPIOE
+#define USART8_Rx_GPIO                  GPIOE
+
+#define USART8_Tx_GPIO_Pin              GPIO_Pin_1
+#define USART8_Rx_GPIO_Pin              GPIO_Pin_0
+
+#define USART8_Tx_GPIO_PinSource        GPIO_PinSource1
+#define USART8_Rx_GPIO_PinSource        GPIO_PinSource0
+
+/****************************************************************/
+#endif /* STM32F427_437xx || STM32F429_439xx || STM32F469_479xx || STM32F413_423xx */
+
+#if defined(STM32F413_423xx)
+/********************* USART9 Configuration *********************/
+
+#define USART9_BufferSize_Tx            (0)
+#define USART9_BufferSize_Rx            (0)
+
+#define USART9_DMA_BufferSize_Tx        (0)
+#define USART9_DMA_BufferSize_Rx        (0)
+
+#define USART9_IRQ_PreemptionPriority   (0)
+#define USART9_IRQ_SubPriority          (0)
+
+#define USART9_Tx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOG
+#define USART9_Rx_RCC_AHB1Periph_GPIO   RCC_AHB1Periph_GPIOG
+
+#define USART9_Tx_GPIO                  GPIOG
+#define USART9_Rx_GPIO                  GPIOG
+
+#define USART9_Tx_GPIO_Pin              GPIO_Pin_1
+#define USART9_Rx_GPIO_Pin              GPIO_Pin_0
+
+#define USART9_Tx_GPIO_PinSource        GPIO_PinSource1
+#define USART9_Rx_GPIO_PinSource        GPIO_PinSource0
+
+/****************************************************************/
+
+/******************** USART10 Configuration *********************/
+
+#define USART10_BufferSize_Tx           (0)
+#define USART10_BufferSize_Rx           (0)
+
+#define USART10_DMA_BufferSize_Tx       (0)
+#define USART10_DMA_BufferSize_Rx       (0)
+
+#define USART10_IRQ_PreemptionPriority  (0)
+#define USART10_IRQ_SubPriority         (0)
+
+#define USART10_Tx_RCC_AHB1Periph_GPIO  RCC_AHB1Periph_GPIOE
+#define USART10_Rx_RCC_AHB1Periph_GPIO  RCC_AHB1Periph_GPIOE
+
+#define USART10_Tx_GPIO                 GPIOE
+#define USART10_Rx_GPIO                 GPIOE
+
+#define USART10_Tx_GPIO_Pin             GPIO_Pin_3
+#define USART10_Rx_GPIO_Pin             GPIO_Pin_2
+
+#define USART10_Tx_GPIO_PinSource       GPIO_PinSource3
+#define USART10_Rx_GPIO_PinSource       GPIO_PinSource2
+
+/****************************************************************/
+#endif /* STM32F413_423xx */
 
 /****************************************************************
  *                       Type definition
@@ -166,35 +293,17 @@
 /****************************************************************
  *                     Variable declaration
 *****************************************************************/
-extern uint8_t USART1_Buffer_Tx[USART1_BufferSize_Tx];
-extern uint8_t USART1_Buffer_Rx[USART1_BufferSize_Rx];
 
-extern uint8_t USART2_Buffer_Tx[USART2_BufferSize_Tx];
-extern uint8_t USART2_Buffer_Rx[USART2_BufferSize_Rx];
-
-extern uint8_t USART3_Buffer_Tx[USART3_BufferSize_Tx];
-extern uint8_t USART3_Buffer_Rx[USART3_BufferSize_Rx];
-
-extern uint8_t USART4_Buffer_Tx[USART4_BufferSize_Tx];
-extern uint8_t USART4_Buffer_Rx[USART4_BufferSize_Rx];
-
-extern uint8_t USART5_Buffer_Tx[USART5_BufferSize_Tx];
-extern uint8_t USART5_Buffer_Rx[USART5_BufferSize_Rx];
-
-extern uint8_t USART6_Buffer_Tx[USART6_BufferSize_Tx];
-extern uint8_t USART6_Buffer_Rx[USART6_BufferSize_Rx];
 
 /****************************************************************
  *                     Function declaration
 *****************************************************************/
-void USART_Configuration(uint8_t USART_x, uint32_t BaudRate, uint16_t USART_Mode, uint16_t USART_IT, uint16_t USART_DMAReq);
-void USART_DMA_TX_Configuration(uint8_t USART_x, uint32_t DMA_Memory0BaseAddr, uint16_t DMA_BufferSize);
-void USART_DMA_RX_Configuration(uint8_t USART_x, uint32_t DMA_Memory0BaseAddr, uint16_t DMA_BufferSize);
-void USART_DMA_TX(uint8_t USART_x, uint16_t DMA_BufferSize);
-void USART_DMA_RX(uint8_t USART_x, uint16_t DMA_BufferSize);
-void USART_OUT(uint8_t USART_x, uint8_t* Buffer, uint16_t BufferSize);
-void USART_IN(uint8_t USART_x);
-uint16_t USART_GetReceiveDataNumber(uint8_t USART_x);
+void USART_Configuration(USART_TypeDef* USARTx, uint32_t BaudRate);
+void USART_Unconfigure(USART_TypeDef* USARTx);
+uint32_t USART_SetSendData(USART_TypeDef* USARTx, void* Data, uint32_t Length);
+uint32_t USART_GetReceiveData(USART_TypeDef* USARTx, void* Data, uint32_t Length);
+void USART_SendDataFinishCallback(USART_TypeDef* USARTx);
+void USART_ReceiveDataFinishCallback(USART_TypeDef* USARTx);
 
 #ifdef __cplusplus
 }

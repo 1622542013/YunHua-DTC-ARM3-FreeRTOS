@@ -45,7 +45,7 @@ void ExtiInit(void)
 
 void USART_Init_Usr()
 {
-
+  USART_Configuration(UART4, 460800);
 }
 
 TpVoid NVIC_Config(TpVoid)
@@ -121,9 +121,7 @@ void HardWareInit(TpVoid)
 {
   SysClockInit(); 
   SystickInit();
-
-  TIM_Configuration();
-  ExtiInit();
+  
   USART_Init_Usr();
   NVIC_Config();
 }

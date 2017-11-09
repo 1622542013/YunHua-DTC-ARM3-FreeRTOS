@@ -39,7 +39,7 @@
 #define configUSE_PREEMPTION			1   /**< 使能抢占调度器 */
 #define configUSE_IDLE_HOOK				0   /**< 使能空闲钩子函数 */
 #define configUSE_TICK_HOOK				0   /**< 使能滴答时钟中断里的钩子函数 */
-#define configCPU_CLOCK_HZ				( (uint32_t)84000000 )        /**< 定义系统主频84M */
+#define configCPU_CLOCK_HZ				( (uint32_t)168000000 )        /**< 定义系统主频84M */
 #define configTICK_RATE_HZ				( ( TickType_t ) 1000)       /**< 定义系统时钟节拍  1MHZ */
 #define configMAX_PRIORITIES			( 5 )                         /**< 定义系统最大优先级数，定义为5 ，则可使用优先级0，1，2，3，4，不包含5 */
 #define configMINIMAL_STACK_SIZE	( ( uint32_t ) 130 )    /**< 定义系统空闲任务堆大小 */
