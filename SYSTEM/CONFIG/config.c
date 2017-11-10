@@ -45,7 +45,7 @@ void ExtiInit(void)
 
 void USART_Init_Usr()
 {
-  USART_Configuration(UART4, 460800);
+  USART_Configuration(USART1, 230400);
 }
 
 TpVoid NVIC_Config(TpVoid)

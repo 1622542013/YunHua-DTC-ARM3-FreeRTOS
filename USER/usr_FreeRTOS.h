@@ -8,11 +8,11 @@
 
 #include "FreeRTOS.h"
 
-
-
 #include "task.h"
 #include "queue.h"
 #include "croutine.h"
 #include "event_groups.h"
+
+#include <Net_Config.h>
 
 #endif

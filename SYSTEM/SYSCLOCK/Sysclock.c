@@ -11,7 +11,7 @@ STM32F4xx 内部时钟16M
 VCO 时钟 必须在192M 到 432M 之间
 */
 
-/* 以一下参数配置 ：[ pll = 16M * (336 / 16) / 1 ] == 84M */
+/* 以一下参数配置 ：[ pll = 16M * (336 / 16) / 4 ] == 84M */
 #define PLL_usr_M         16
 #define PLL_usr_N         336
 #define PLL_usr_P         4
@@ -27,10 +27,13 @@ static void SysClockHSI(void);
   * - 0x08: PLL used as system clock (PLL P for STM32F446xx devices)
   * - 0x0C: PLL R used as system clock (only for STM32F446xx devices)
   */
+RCC_ClocksTypeDef sysclock;
 void SysClockInit(void)
 {   
     SysClockSource = RCC_GetSYSCLKSource();
-    
+  
+    RCC_GetClocksFreq(&sysclock);  
+  
     if(SysClockSource != Osc_Status_PLL)
     {
       SysClockHSI();

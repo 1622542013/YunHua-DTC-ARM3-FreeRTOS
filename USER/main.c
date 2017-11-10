@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "usr_FreeRTOS.h"
+#include "TCP_user.h"
 
 void TaskCreatUser(void);
 void TaskGroupCreatUser(void);
@@ -41,16 +42,39 @@ TpInt32 main(TpVoid)
 
 /*-----------任务--------------*/
 TaskHandle_t HandleTaskStart = NULL;
-
 void TaskStart(void* pv)
 {  
   static uint8_t send_buff[200];
   uint16_t num;
+  TickType_t xLastSYSTime;
+  
+  TcpInit();
+  
+  xLastSYSTime = xTaskGetTickCount();
+  
   while(1)
   {
-        num = snprintf((char *)send_buff,200,"啦啦啦啦");
-        USART_SetSendData(UART4, send_buff, num); 
-        vTaskDelay(1000);
+      timer_tick ();
+    
+      num = snprintf((char *)send_buff,200,"啦啦啦啦\r\n");
+      USART_SetSendData(USART1, send_buff, num); 
+      vTaskDelayUntil(&xLastSYSTime, 1000);
+  }
+}
+
+TaskHandle_t HandleTaskTCPnet = NULL;
+void TaskTCPnet(void* pv)
+{  
+  static uint8_t send_buff[200];
+  uint16_t num;
+  TickType_t xLastSYSTime;
+  
+  while(1)
+  {
+      TcpNetTest();
+      num = snprintf((char *)send_buff,200,"啦啦啦啦\r\n");
+      USART_SetSendData(USART1, send_buff, num); 
+      vTaskDelayUntil(&xLastSYSTime, 1000);
   }
 }
 
@@ -58,20 +82,29 @@ void TaskStart(void* pv)
 
 void TaskCreatUser(void)
 { 
-  xTaskCreate( TaskStart,           /* 任务函数 */
-               "TaskStart",    /* 任务名    */
-               500,              /* 任务栈大小，单位：4字节 */
-               NULL,             /* 任务参数  */
-               2,                /* 任务优先级*/
+  xTaskCreate( TaskStart,         /* 任务函数 */
+               "TaskStart",       /* 任务名    */
+               500,               /* 任务栈大小，单位：4字节 */
+               NULL,              /* 任务参数  */
+               2,                 /* 任务优先级*/
                &HandleTaskStart); /* 任务句柄  */
+  
+  xTaskCreate( TaskTCPnet,         /* 任务函数 */
+               "TaskTCPnet",       /* 任务名    */
+               500,               /* 任务栈大小，单位：4字节 */
+               NULL,              /* 任务参数  */
+               2,                 /* 任务优先级*/
+               &HandleTaskTCPnet); /* 任务句柄  */
 }
 
 void USART_ReceiveDataFinishCallback(USART_TypeDef* USARTx)
 {
-  if(USARTx == UART4)
-  {
-      int a = 0;
-      a= 1;
+  int a = 0;
+  
+  if(USARTx == USART1)
+  {  
+      a ++;
+      a --;
   }
 }
 
