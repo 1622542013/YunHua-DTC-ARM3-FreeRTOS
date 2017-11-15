@@ -11,6 +11,7 @@
 #include "stm32f4xx_it.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "usr_FreeRTOS.h"
 #include "TCP_user.h"
@@ -26,6 +27,9 @@ TpInt32 main(TpVoid)
   /* ¥¥Ω®»ŒŒÒ*/
 
   HardWareInit(); 
+  
+  	/* ≥ı ºªØRL-TCPnet */
+	init_TcpNet ();
   
   TaskCreatUser();
 
@@ -48,16 +52,15 @@ void TaskStart(void* pv)
   uint16_t num;
   TickType_t xLastSYSTime;
   
-  TcpInit();
-  
   xLastSYSTime = xTaskGetTickCount();
   
   while(1)
   {
       timer_tick ();
     
-      num = snprintf((char *)send_buff,200,"¿≤¿≤¿≤¿≤\r\n");
-      USART_SetSendData(USART1, send_buff, num); 
+    printf((char *)send_buff,"¿≤¿≤¿≤¿≤\r\n");
+//      num = snprintf((char *)send_buff,200,"¿≤¿≤¿≤¿≤\r\n");
+//      USART_SetSendData(USART1, send_buff, num); 
       vTaskDelayUntil(&xLastSYSTime, 1000);
   }
 }
@@ -72,8 +75,8 @@ void TaskTCPnet(void* pv)
   while(1)
   {
       TcpNetTest();
-      num = snprintf((char *)send_buff,200,"¿≤¿≤¿≤¿≤\r\n");
-      USART_SetSendData(USART1, send_buff, num); 
+//      num = snprintf((char *)send_buff,200,"¿≤¿≤¿≤¿≤\r\n");
+//      USART_SetSendData(USART1, send_buff, num); 
       vTaskDelayUntil(&xLastSYSTime, 1000);
   }
 }

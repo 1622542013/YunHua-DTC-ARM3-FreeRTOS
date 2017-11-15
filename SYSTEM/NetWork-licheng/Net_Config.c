@@ -20,13 +20,13 @@
 //   <i> This is the name under which embedded host
 //   <i> can be accessed on a local area network.
 //   <i> Default: "mcb2300"
-#define LHOST_NAME     "mcb2300"
+#define LHOST_NAME     "armfly"
 
 //   <o>Memory Pool size <1536-262144:4><#/4>
 //   <i> This is the size of a memory pool in bytes. Buffers for
 //   <i> TCPnet packets are allocated from this memory pool.
 //   <i> Default: 8000 bytes
-#define MEM_SIZE       2000
+#define MEM_SIZE       2048
 
 //   <o>Tick Timer interval <10=> 10 ms <20=> 20 ms <25=> 25 ms
 //                          <40=> 40 ms <50=> 50 ms <100=> 100 ms 
@@ -88,7 +88,7 @@
 
 //     <o>Address byte 3 <0-255>
 //     <i> Default: 0
-#define _IP3           0
+#define _IP3           1
 
 //     <o>Address byte 4 <0-255>
 //     <i> Default: 100
@@ -128,11 +128,11 @@
 
 //     <o>Address byte 3 <0-255>
 //     <i> Default: 0
-#define _GW3           0
+#define _GW3           1
 
 //     <o>Address byte 4 <0-255>
 //     <i> Default: 254
-#define _GW4           254
+#define _GW4           1
 
 //   </h>
 //   <h>Primary DNS Server
@@ -247,7 +247,7 @@
 //     <i> This value is optional. If enabled, a list of NTP Servers
 //     <i> (option 42) is also requested from DHCP server.
 //     <i> Default: disabled
-#define DHCP_NTPSRV    0
+#define DHCP_NTPSRV    1
 
 //   </e>
 // </e>
@@ -496,7 +496,7 @@
 //   <o>Number of UDP Sockets <1-20>
 //   <i> Number of available UDP sockets
 //   <i> Default: 5
-#define UDP_NUMSOCKS   5
+#define UDP_NUMSOCKS   2
 
 // </e>
 // <e>TCP Sockets
@@ -507,7 +507,7 @@
 //   <o>Number of TCP Sockets <1-20>
 //   <i> Number of available TCP sockets
 //   <i> Default: 5
-#define TCP_NUMSOCKS   5
+#define TCP_NUMSOCKS   2
 
 //   <o>Number of Retries <0-20>
 //   <i> How many times TCP module will try to retransmit data
@@ -554,7 +554,7 @@
 //   <o>Number of HTTP Sessions <1-10>
 //   <i> Number of simultaneously active HTTP Sessions.
 //   <i> Default: 3
-#define HTTP_NUMSESS   3
+#define HTTP_NUMSESS   5
 
 //   <o>Port Number <1-65535>
 //   <i> Listening port number.
@@ -595,7 +595,7 @@
 //   <o>Number of Telnet Connections <1-10>
 //   <i> Number of simultaneously active Telnet Connections.
 //   <i> Default: 1
-#define TNET_NUMSESS   1
+#define TNET_NUMSESS   2
 
 //   <o>Port Number <1-65535>
 //   <i> Listening port number.
@@ -696,7 +696,7 @@
 //   <o>Number of FTP Sessions <1-10>
 //   <i> Number of simultaneously active FTP Sessions
 //   <i> Default: 1
-#define FTP_NUMSESS    1
+#define FTP_NUMSESS    3
 
 //   <o>Port Number <1-65535>
 //   <i> Listening port number.
@@ -808,7 +808,7 @@
 
 //   <o>Address byte 4 <0-255>
 //   <i> Default: 100
-#define SNMP_TRAPIP4   100
+#define SNMP_TRAPIP4   1
 
 //   </h>
 // </e>

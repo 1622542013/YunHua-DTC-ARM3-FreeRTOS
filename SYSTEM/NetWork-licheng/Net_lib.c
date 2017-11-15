@@ -19,10 +19,10 @@
 #ifdef __NET_CONFIG__
 
 #if (__RTX)
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
+  #include "FreeRTOS.h"
+  #include "task.h"
+  #include "queue.h"
+  #include "semphr.h"
 #endif
 
 /* Non-Critical Net_Config.c upgrade */
@@ -374,11 +374,8 @@ DNS_CFG dns_config = {
 #if (BSD_ENABLE) 
  static BSD_INFO bsd_scb[BSD_NUMSOCKS + BSD_SRVSOCKS];
  #ifdef __RTX
-  static OS_MUT bsd_mutex;
- 
-SemaphoreHandle_t bsd_mutex = NULL;
-SemaphoreHandle_t bsd_sem = NULL;
- 
+   SemaphoreHandle_t  bsd_mutex = NULL;
+   SemaphoreHandle_t  bsd_sem = NULL;
   #define BSD_INRTX  __TRUE
  #else
   #define BSD_INRTX  __FALSE
@@ -400,7 +397,7 @@ SemaphoreHandle_t bsd_sem = NULL;
 
 void init_system (void) {
   /* Initialize configured interfaces and applications. */
-
+	
 #if (ETH_ENABLE)
   eth_init_link ();
 #endif
@@ -467,19 +464,19 @@ void init_system (void) {
 #endif
 
 #if (BSD_ENABLE && __RTX)
-//  os_mut_init (bsd_mutex);
-  
-bsd_mutex = xSemaphoreCreateMutex();
-if(bsd_mutex == NULL)
-{
-/* ERR */
-}
-bsd_sem = xSemaphoreCreateBinary();
-if(bsd_sem == NULL)
-{
-/* ERR */
-}
-  
+ {
+	bsd_mutex = xSemaphoreCreateMutex();
+	if(bsd_mutex == NULL)
+    {
+        /* ERR */
+    }	 
+	
+	bsd_sem = xSemaphoreCreateBinary();
+	if(bsd_sem == NULL)
+    {
+        /* ERR */
+    }
+ }
 #endif
 }
 
@@ -490,8 +487,7 @@ void run_system (void) {
   /* Run configured interfaces and applications. */
 
 #if (BSD_ENABLE && __RTX)
-//  os_mut_wait (bsd_mutex, 0xFFFF);
-xSemaphoreTake(bsd_mutex, portMAX_DELAY);
+	xSemaphoreTake(bsd_mutex, portMAX_DELAY);
 #endif
 
 #if (ETH_ENABLE)
@@ -549,8 +545,7 @@ xSemaphoreTake(bsd_mutex, portMAX_DELAY);
 #endif
 
 #if (BSD_ENABLE && __RTX)
-//  os_mut_release (bsd_mutex);
-xSemaphoreGive(bsd_mutex);
+  xSemaphoreGive(bsd_mutex);
 #endif
 }
 
@@ -560,21 +555,14 @@ xSemaphoreGive(bsd_mutex);
 #if (BSD_ENABLE && __RTX)
 __used void bsd_suspend (U8 *tsk_id) {
   /* Suspend a socket owner task. */
-//  *tsk_id = (U8)os_tsk_self ();
-//  os_mut_release (bsd_mutex);
-//  os_evt_wait_or (0x8000, 0xFFFF);
-//  os_mut_wait (bsd_mutex, 0xFFFF);
-xSemaphoreGive(bsd_mutex);
-xSemaphoreTake(bsd_sem, portMAX_DELAY);
-xSemaphoreTake(bsd_mutex, portMAX_DELAY);
+  xSemaphoreGive(bsd_mutex);
+  xSemaphoreTake(bsd_sem, portMAX_DELAY);
+  xSemaphoreTake(bsd_mutex, portMAX_DELAY);	
 }
 
 __used void bsd_resume (U8 tsk_id) {
   /* Resume a task waiting for a socket event. */
-//  if (tsk_id) {
-//    os_evt_set (0x8000, tsk_id);
-//  }
-xSemaphoreGive(bsd_sem);
+  xSemaphoreGive(bsd_sem);
 }
 #endif
 
@@ -584,14 +572,12 @@ xSemaphoreGive(bsd_sem);
 #if (BSD_ENABLE && __RTX)
 __used void bsd_lock (void) {
   /* Acquire mutex - Lock TCPnet functions. */
-//  os_mut_wait (bsd_mutex, 0xFFFF);
-xSemaphoreTake(bsd_mutex, portMAX_DELAY);
+  xSemaphoreTake(bsd_mutex, portMAX_DELAY);	
 }
 
 __used void bsd_unlock (void) {
   /* Release mutex - Unlock TCPnet functions. */
-//  os_mut_release (bsd_mutex);
-xSemaphoreGive(bsd_mutex);
+  xSemaphoreGive(bsd_mutex);
 }
 #endif
 

@@ -1,163 +1,131 @@
 #include "TCP_user.h"
 #include "stm32f4xx.h"
 #include "usr_FreeRTOS.h"
+#include "usart.h"
+
+uint8_t socket_tcp;
+#define PORT_NUM       1001    /* TCP服务器监听端口号 */
 
 void TcpInit(void)
 {
   
 }
 
+U16 tcp_callback (U8 soc, U8 evt, U8 *ptr, U16 par)
+{
+	char buf[100];
+	uint16_t i;
+  uint32_t num;
+	
+	/* 确保是socket_tcp的回调 */
+	if (soc != socket_tcp) 
+	{
+		return (0);
+	}
+
+	switch (evt) 
+	{
+		/*
+			远程客户端连接消息
+		    1、数组ptr存储远程设备的IP地址，par中存储端口号。
+		    2、返回数值1允许连接，返回数值0禁止连接。
+		*/
+		case TCP_EVT_CONREQ:
+			num = snprintf(buf,100,"远程客户端请求连接IP: %d.%d.%d.%d\r\n端口port:%d\r\n", ptr[0], ptr[1], ptr[2], ptr[3],par);
+    
+      USART_SetSendData(USART1, buf, num);
+			return (1);
+		
+		/* 连接终止 */
+		case TCP_EVT_ABORT:
+			break;
+		
+		/* Socket远程连接已经建立 */
+		case TCP_EVT_CONNECT:
+      
+      num = snprintf(buf,100,"Socket is connected to remote peer\r\n");
+			USART_SetSendData(USART1, buf, num);
+			break;
+		
+		/* 连接断开 */
+		case TCP_EVT_CLOSE:     
+      num = snprintf(buf,100,"Connection has been closed\r\n");
+			USART_SetSendData(USART1, buf, num);
+			break;
+		
+		/* 发送的数据收到远程设备应答 */
+		case TCP_EVT_ACK:
+			break;
+		
+		/* 接收到TCP数据帧，ptr指向数据地址，par记录数据长度，单位字节 */
+		case TCP_EVT_DATA:
+      num = snprintf(buf,100,"Data length = %d\r\n", par);
+			USART_SetSendData(USART1, buf, num);  
+    
+			for(i = 0; i < par; i++)
+			{
+        num = snprintf(buf,100,"ptr[%d] = %d\r\n", i, ptr[i]);
+        USART_SetSendData(USART1, buf, num); 
+			}
+			break;
+	}
+	return (0);
+}
+
+uint8_t TCP_StatusCheck(void) 
+{
+	uint8_t res;
+	
+	switch (tcp_get_state(socket_tcp)) 
+	{
+		case TCP_STATE_FREE:
+		case TCP_STATE_CLOSED:
+			res = tcp_listen (socket_tcp, PORT_NUM);
+      char buf[50];
+      uint32_t num;
+      num = snprintf(buf,100,"tcp listen res = %d\r\n", res);
+      USART_SetSendData(USART1, buf, num); 
+			break;
+		
+		case TCP_STATE_LISTEN:
+			break;
+		
+		case TCP_STATE_CONNECT:
+			return (__TRUE);
+			
+		default:  
+			break;
+	}
+	
+	return (__FALSE);
+}
+
 void TcpNetTest(void)
 {
-  int32_t iCount;
-	uint8_t *sendbuf;
+  char buf[100];
+  uint32_t num;
+  
 	uint8_t tcp_status;
 	uint16_t maxlen;
 	uint8_t res;
-	const TickType_t xTicksToWait = 2; /* ?ó3ù2ms */
-	EventBits_t uxBits;
+	const TickType_t xTicksToWait = 2; 
 	
-	/* 
-	   ′′?¨TCP Socket2￠′′?¨?àìy￡??í?§??á??ó·t???÷oó￡?10???ú?Têy?Yí¨D??????aá??ó?￡
-	   μ?ê?óéóú?aà?ê1?üá?TCP_TYPE_KEEP_ALIVE￡??áò??±±￡3?á??ó￡?2?êü10??μ?ê±???T???￡
-	*/
-    socket_tcp = tcp_get_socket (TCP_TYPE_SERVER|TCP_TYPE_KEEP_ALIVE, 0, 10, tcp_callback);
+  socket_tcp = tcp_get_socket (TCP_TYPE_SERVER|TCP_TYPE_KEEP_ALIVE, 0, 10, tcp_callback);
+  
 	if(socket_tcp != 0)
 	{
-		res = tcp_listen (socket_tcp, PORT_NUM);
-		printf_debug("tcp listen res = %d\r\n", res);
+		res = tcp_listen (socket_tcp, PORT_NUM);   
+    num = snprintf(buf,100,"tcp listen res = %d\r\n", res);
+    USART_SetSendData(USART1, buf, num); 
 	}
 	
 	while (1) 
 	{
-		/* RL-TCPnet′|àíoˉêy */
+		/* RL-TCPnet处理函数 */
 		main_TcpNet();
 		
-		/* ó?óúí???2?°?μ?′|àí */
-		tcp_status = TCP_StatusCheck();
+////		/* 用于网线插拔的处理 */
+//		tcp_status = TCP_StatusCheck();
 
-		/* μè′y?ùóDè???·￠à′ê??t±ê?? */
-		uxBits = xEventGroupWaitBits(xCreatedEventGroup, /* ê??t±ê??×é??±ú */
-							         0xFFFF,       		 /* μè′y0xFFFF?3ò???±?éè?? */
-							         pdTRUE,             /* í?3??°0xFFFF??±???3y￡??aà?ê?è?òa0xFFFF??±?éè???í?°í?3??±*/
-							         pdFALSE,            /* éè???apdTRUE±íê?μè′y0xFFFFè?òa??±?éè??*/
-							         xTicksToWait); 	 /* μè′y?ó3ùê±?? */
-
-		if((uxBits != 0)&&(tcp_status == __TRUE))
-		{
-			switch (uxBits)
-			{
-				/* ?óê?μ?K1?ü°′??￡?????3ìTCP?í?§??·￠?í8×??úêy?Y */
-				case KEY1_BIT0:			  
-					printf_debug("tcp_get_state(socket_tcp) = %d\r\n", tcp_get_state(socket_tcp));
-					iCount = 8;
-					do
-					{
-						main_TcpNet();
-						if (tcp_check_send (socket_tcp) == __TRUE) 
-						{
-							maxlen = tcp_max_dsize (socket_tcp);
-							iCount -= maxlen;
-							
-							if(iCount < 0)
-							{
-								/* ?a?′???????êìaμ? */
-								maxlen = iCount + maxlen;
-							}
-							
-							sendbuf = tcp_get_buf(maxlen);
-							sendbuf[0] = '1';
-							sendbuf[1] = '2';
-							sendbuf[2] = '3';
-							sendbuf[3] = '4';
-							sendbuf[4] = '5';
-							sendbuf[5] = '6';
-							sendbuf[6] = '7';
-							sendbuf[7] = '8';
-							
-							/* 2aê?·￠?????üê1ó???è?μ??ú′? */
-							tcp_send (socket_tcp, sendbuf, maxlen);
-						}
-						
-					}while(iCount > 0);
-					break;
-
-				/* ?óê?μ?K2?ü°′??￡?????3ìTCP?í?§??·￠?í1024×??úμ?êy?Y */
-				case KEY2_BIT1:		
-					printf_debug("tcp_get_state(socket_tcp) = %d\r\n", tcp_get_state(socket_tcp));
-					iCount = 1024;
-					do
-					{
-						main_TcpNet();
-						if (tcp_check_send (socket_tcp) == __TRUE) 
-						{
-							maxlen = tcp_max_dsize (socket_tcp);
-							iCount -= maxlen;
-							
-							if(iCount < 0)
-							{
-								/* ?a?′???????êìaμ? */
-								maxlen = iCount + maxlen;
-							}
-							
-							/* ?aà???3?ê??ˉá???′??ù·￠?íêy?Y°üμ??°8??×??ú */
-							sendbuf = tcp_get_buf(maxlen);
-							sendbuf[0] = 'a';
-							sendbuf[1] = 'b';
-							sendbuf[2] = 'c';
-							sendbuf[3] = 'd';
-							sendbuf[4] = 'e';
-							sendbuf[5] = 'f';
-							sendbuf[6] = 'g';
-							sendbuf[7] = 'h';
-							
-							/* 2aê?·￠?????üê1ó???è?μ??ú′? */
-							tcp_send (socket_tcp, sendbuf, maxlen);
-						}
-						
-					}while(iCount > 0);					
-					break;
-					
-				/* ?óê?μ?K3?ü°′??￡?????3ìTCP?í?§??·￠?í5MBêy?Y */
-				case KEY3_BIT2:			  
-					printf_debug("tcp_get_state(socket_tcp) = %d\r\n", tcp_get_state(socket_tcp));
-					iCount = 5*1024*1024;
-					do
-					{
-						main_TcpNet();
-						if (tcp_check_send (socket_tcp) == __TRUE) 
-						{
-							maxlen = tcp_max_dsize (socket_tcp);
-							iCount -= maxlen;
-							
-							if(iCount < 0)
-							{
-								/* ?a?′???????êìaμ? */
-								maxlen = iCount + maxlen;
-							}
-							
-							/* ?aà???3?ê??ˉá???′??ù·￠?íêy?Y°üμ??°8??×??ú */
-							sendbuf = tcp_get_buf(maxlen);
-							sendbuf[0] = 'a';
-							sendbuf[1] = 'b';
-							sendbuf[2] = 'c';
-							sendbuf[3] = 'd';
-							sendbuf[4] = 'e';
-							sendbuf[5] = 'f';
-							sendbuf[6] = 'g';
-							sendbuf[7] = 'h';
-							
-							/* 2aê?·￠?????üê1ó???è?μ??ú′? */
-							tcp_send (socket_tcp, sendbuf, maxlen);
-						}
-						
-					}while(iCount > 0);
-					break;
-				
-				 /* ????μ??ü?μ2?′|àí */
-				default:                     
-					break;
-			}
-		}
 	}
 }

@@ -1,3 +1,23 @@
+/*
+*********************************************************************************************************
+*
+*	模块名称 : STM32F4XX的MAC驱动
+*	文件名称 : ETH_STM32F4XX.C
+*	版    本 : V2.0
+*	说    明 : 由官方的驱动修改而来。
+*              1. 原始驱动支持DP83848C 和ST802RT1，修改为仅支持DM9161/9162，方便驱动的规范化。
+*              2. 增加PHY的中断触发功能，主要用于检测网线的连接状态。
+*              3. 变量g_ucEthLinkStatus用于表示连接状态。
+*                         
+*	修改记录 :
+*		版本号    日期         作者            说明
+*       V1.0    2015-12-22    Eric2013         首发
+*       V2.0    2017-04-17    Eric2013         整理，并使其规范化
+*
+*	Copyright (C), 2015-2020, 安富莱电子 www.armfly.com
+*
+*********************************************************************************************************
+*/
 /*----------------------------------------------------------------------------
  *      RL-ARM - TCPnet
  *----------------------------------------------------------------------------
@@ -301,7 +321,7 @@ typedef struct {
 #define PHY_REG_RN1F        0x1F        /* Shadow Registers enable regiser   */
 #define PHY_REG_RS1B        0x1B        /* MISC/status/error/test shadow reg.*/
 
-/* DP83848C PHY Registers */
+/* DP83848C and DM9161/9162 PHY Registers is the same */
 #define PHY_REG_BMCR        0x00        /* Basic Mode Control Register       */
 #define PHY_REG_BMSR        0x01        /* Basic Mode Status Register        */
 #define PHY_REG_IDR1        0x02        /* PHY Identifier 1                  */
@@ -309,9 +329,16 @@ typedef struct {
 #define PHY_REG_ANAR        0x04        /* Auto-Negotiation Advertisement    */
 #define PHY_REG_ANLPAR      0x05        /* Auto-Neg. Link Partner Abitily    */
 #define PHY_REG_ANER        0x06        /* Auto-Neg. Expansion Register      */
-#define PHY_REG_ANNPTR      0x07        /* Auto-Neg. Next Page TX            */
+#define PHY_REG_ANNPTR      0x07        /* Auto-Neg. Next Page TX .DM9161 NO */
 
-/* PHY Extended Registers */
+/* Register BMCR bit defination */
+#define PHY_FULLD_100M      0x2100      /* Full Duplex 100Mbit               */
+#define PHY_HALFD_100M      0x2000      /* Half Duplex 100Mbit               */
+#define PHY_FULLD_10M       0x0100      /* Full Duplex 10Mbit                */
+#define PHY_HALFD_10M       0x0000      /* Half Duplex 10MBit                */
+#define PHY_AUTO_NEG        0x1000      /* Select Auto Negotiation           */
+
+/* PHY Extended Registers  only for DP83848C */
 #define PHY_REG_STS         0x10        /* Status Register                   */
 #define PHY_REG_MICR        0x11        /* MII Interrupt Control Register    */
 #define PHY_REG_MISR        0x12        /* MII Interrupt Status Register     */
@@ -325,14 +352,22 @@ typedef struct {
 #define PHY_REG_CDCTRL1     0x1B        /* CD Test Control and BIST Extens.  */
 #define PHY_REG_EDCR        0x1D        /* Energy Detect Control Register    */
 
-#define PHY_FULLD_100M      0x2100      /* Full Duplex 100Mbit               */
-#define PHY_HALFD_100M      0x2000      /* Half Duplex 100Mbit               */
-#define PHY_FULLD_10M       0x0100      /* Full Duplex 10Mbit                */
-#define PHY_HALFD_10M       0x0000      /* Half Duplex 10MBit                */
-#define PHY_AUTO_NEG        0x1000      /* Select Auto Negotiation           */
+/* PHY Extended Registers  only for DM9161/9162 */
+#define PHY_REG_DSCR        0x10     /* Specified Congfiguration Register            */
+#define PHY_REG_DSCSR       0x11     /* Specified Congfiguration and Status Register */
+#define PHY_REG_10BTCSR     0x12     /* 10Base-T Status/Control Register     		 */
+#define PHY_REG_PWDOR       0x13     /* Power Down Control Register       			 */
+#define PHY_REG_CONGFIG   	0x14     /* Specified Congfig Register      			 */
+#define PHY_REG_INTERRUPT   0x15     /* Specified interrupt Register             	 */
+#define PHY_REG_SRECR       0x16     /* Specified Receive Error Counter  			 */
+#define PHY_REG_DISCR       0x17     /* Specified Disconnect Counter Register        */
+#define PHY_REG_RLSR       	0x18     /* Hardware reset latch state Register			 */
+#define PHY_REG_PSCR       	0x1D     /* Power Saving control register                */
 
 
 #define PHY_DEF_ADDR        0x01        /* Default PHY device address        */
+#define PHY_ID_DM9161       0x0181B8B0  /* DM9161 PHY Identifier            */
+#define PHY_ID_DM9162       0x0181B8A0  /* DM9162 PHY Identifier            */
 #define PHY_ID_DP83848C     0x20005C90  /* DP83848C PHY Identifier           */
 #define PHY_ID_ST802RT1     0x02038460  /* ST802RT1x PHY Identifier          */
 #endif
