@@ -22,7 +22,7 @@
 #include <stm32f4xx.h>             
 #include "ETH_STM32F4xx.h"
 #include "stdio.h"
-
+#include "USART.h"
 
 
 /*
@@ -122,6 +122,7 @@ static void Eth_Link_EXTIConfig(void);
 *********************************************************************************************************
 */
 #include "usart.h"
+#include "delay.h"
 void init_ethernet (void) 
 {
 	U32 regv,tout,conn; 
@@ -183,12 +184,9 @@ void init_ethernet (void)
   GPIO_ResetBits(GPIOD, GPIO_Pin_3);
   
    
-   for(int i = 0; i<99999;i++)
-   {
-      __nop();__nop();__nop(); __nop();__nop();__nop(); __nop();__nop();__nop(); __nop();__nop();__nop();
-   }
+  Delay_ms(50);
    
-   GPIO_SetBits(GPIOD, GPIO_Pin_3);
+  GPIO_SetBits(GPIOD, GPIO_Pin_3);
   
 	/* 
 	  寄存器ETH->DMABMR的SR位置1后，MAC DMA控制器会复位所有MAC子系统的内部寄存器和逻辑。在所有内
@@ -220,11 +218,7 @@ void init_ethernet (void)
 //	printf_eth("下面是DM9161/9162的硬件初始化：\r\n");
 //	printf_eth("1. Start PHY_ID_DM9161/9162 Init\r\n");
 
-  uint8_t send_buff[50];
-  uint16_t num;
-  
-  num = snprintf((char *)send_buff,50,"下面是PHY的硬件初始化：\r\n");
-  USART_SetSendData(USART1, send_buff, num); 
+  u1_printf("下面是PHY的硬件初始化：\r\n");
 	
 	/* 发送复位命令 */
 	write_PHY (PHY_REG_BMCR, 0x8000);
@@ -235,12 +229,8 @@ void init_ethernet (void)
 		regv = read_PHY (PHY_REG_BMCR);
 		if (!(regv & 0x8800)) 
 		{
+      u1_printf("复位完成\r\n");
 			/* 复位完成 */
-  uint8_t send_buff[50];
-  uint16_t num;
-  
-  num = snprintf((char *)send_buff,50,"复位完成\r\n");
-  USART_SetSendData(USART1, send_buff, num); 
 			break;
 		}
 	}
@@ -260,12 +250,8 @@ void init_ethernet (void)
 		regv = read_PHY (PHY_REG_BMSR);
 		if (regv & 0x0020) 
 		{
+      u1_printf("完成自适应设置\r\n");
 			/* 完成Auto-Negotiation */
-  uint8_t send_buff[50];
-  uint16_t num;
-  
-  num = snprintf((char *)send_buff,50,"完成自适应设置\r\n");
-  USART_SetSendData(USART1, send_buff, num); 
 			break;
 		}
 	}
@@ -277,11 +263,7 @@ void init_ethernet (void)
 		regv = read_PHY (PHY_REG_BMSR);
 		if (regv & (1 << 2)) 
 		{
-  uint8_t send_buff[50];
-  uint16_t num;
-  
-  num = snprintf((char *)send_buff,50,"连接成功\r\n");
-  USART_SetSendData(USART1, send_buff, num); 
+      u1_printf("连接成功\r\n");
 			
 			/* PHY已经连接上网络 */ 
 			g_ucEthLinkStatus = 1;
@@ -291,34 +273,23 @@ void init_ethernet (void)
 			
 			if ((regv & (1 << 15))|(regv & (1 << 13))) 
 			{
+        u1_printf("全双工\r\n");
 				/* 全双工 */
-  uint8_t send_buff[50];
-  uint16_t num;
-  
-  num = snprintf((char *)send_buff,50,"全双工\r\n");
-  USART_SetSendData(USART1, send_buff, num); 
 				conn |= PHY_CON_SET_FULLD;
 			}
 			
 			if ((regv & (1 << 15))|(regv & (1 << 14))) 
 			{
+        u1_printf("速度100Mbps的网络\r\n");
 				/* 速度100Mbps的网络 */
-  uint8_t send_buff[50];
-  uint16_t num;
-  
-  num = snprintf((char *)send_buff,50,"速度100Mbps的网络\r\n");
-  USART_SetSendData(USART1, send_buff, num); 
+
 				conn |= PHY_CON_SET_100M;
 			}
 			break;
 		}
 		else
 		{
-  uint8_t send_buff[50];
-  uint16_t num;
-  
-  num = snprintf((char *)send_buff,50,"连接失败\r\n");
-  USART_SetSendData(USART1, send_buff, num); 
+      u1_printf("连接失败\r\n");
 			
 			/* 未连接上 */ 
 			g_ucEthLinkStatus = 0;
@@ -410,11 +381,7 @@ void init_ethernet (void)
 	/* 设置为最高优先级，仅调用NVIC->ISER设置的默认优先级也是最高优先级0 */
 	NVIC_SetPriority(ETH_IRQn, 0);
 	
-  uint8_t send_buff1[50];
-  uint16_t num1;
-  
-  num1 = snprintf((char *)send_buff1,50,"=======================\r\n");
-  USART_SetSendData(USART1, send_buff1, num1); 
+  u1_printf("初始化完成\r\n");
 
 }
 

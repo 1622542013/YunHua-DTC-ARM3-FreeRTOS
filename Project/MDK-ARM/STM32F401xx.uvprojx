@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,__RTX</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\USER;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\NetWork-licheng;..\..\SYSTEM\LAN8720;..\..\Libraries\STM32F4xx_StdPeriph_Driver\STM32F4x7_ETH_Driver\inc</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\USER;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\NetWork-licheng;..\..\SYSTEM\LAN8720;..\..\Libraries\STM32F4xx_StdPeriph_Driver\STM32F4x7_ETH_Driver\inc;..\..\SYSTEM\Printf-usr</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -438,6 +438,11 @@
               <FileName>lan8720.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\SYSTEM\LAN8720\lan8720.c</FilePath>
+            </File>
+            <File>
+              <FileName>printf_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\Printf-usr\printf_usr.c</FilePath>
             </File>
           </Files>
         </Group>

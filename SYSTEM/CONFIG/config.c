@@ -45,7 +45,9 @@ void ExtiInit(void)
 
 void USART_Init_Usr()
 {
-  USART_Configuration(USART1, 230400);
+   USART_Configuration(USART_1, BAUD_RATE_230400, USART_Mode_Tx|USART_Mode_Rx, USART_IT_IDLE, USART_DMAReq_Tx|USART_DMAReq_Rx);
+   USART_DMA_TX_Configuration(USART_1, (uint32_t)USART1_Buffer_Tx, USART1_BufferSize_Tx);
+   USART_DMA_RX_Configuration(USART_1, (uint32_t)USART1_Buffer_Rx, USART1_BufferSize_Rx);
 }
 
 TpVoid NVIC_Config(TpVoid)
@@ -120,7 +122,7 @@ void TIM_Configuration(void)
 void HardWareInit(TpVoid)
 {
   SysClockInit(); 
-  SystickInit();
+  DelayInit();
   
   USART_Init_Usr();
   NVIC_Config();

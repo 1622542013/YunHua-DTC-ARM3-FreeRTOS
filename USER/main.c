@@ -48,8 +48,8 @@ TpInt32 main(TpVoid)
 TaskHandle_t HandleTaskStart = NULL;
 void TaskStart(void* pv)
 {  
-  static uint8_t send_buff[200];
-  uint16_t num;
+  static uint32_t time_count;
+
   TickType_t xLastSYSTime;
   
   xLastSYSTime = xTaskGetTickCount();
@@ -58,9 +58,9 @@ void TaskStart(void* pv)
   {
       timer_tick ();
     
-    printf((char *)send_buff,"율율율율\r\n");
-//      num = snprintf((char *)send_buff,200,"율율율율\r\n");
-//      USART_SetSendData(USART1, send_buff, num); 
+      time_count++;
+      u1_printf("珂쇌： %d취\r\n",time_count);
+
       vTaskDelayUntil(&xLastSYSTime, 1000);
   }
 }
@@ -68,15 +68,12 @@ void TaskStart(void* pv)
 TaskHandle_t HandleTaskTCPnet = NULL;
 void TaskTCPnet(void* pv)
 {  
-  static uint8_t send_buff[200];
-  uint16_t num;
   TickType_t xLastSYSTime;
   
   while(1)
   {
       TcpNetTest();
-//      num = snprintf((char *)send_buff,200,"율율율율\r\n");
-//      USART_SetSendData(USART1, send_buff, num); 
+ 
       vTaskDelayUntil(&xLastSYSTime, 1000);
   }
 }

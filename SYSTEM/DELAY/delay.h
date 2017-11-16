@@ -34,11 +34,8 @@ extern "C"
 {
 #endif /* __cplusplus */
 	
-TpBool  SystickInit(TpVoid);
-TpVoid  Delay_us(TpUint32 nus);
-TpBool  Delay_ms(TpUint16 nms);
-TpVoid  os_time_init(TpVoid);
-TpFloat os_time(TpVoid);
+void DelayInit(void);
+void Delay_ms(uint32_t ms);
 
 #ifdef __cplusplus
 }

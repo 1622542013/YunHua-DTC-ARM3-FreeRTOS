@@ -5,103 +5,12 @@
  * Description:  Delay Driver
 *****************************************************************/
 
-/*============================================================================*/
-/*                               Header include                               */
-/*============================================================================*/
 
 #include "delay.h"
 
-/*============================================================================*/
-/*                                   Macros                                   */
-/*============================================================================*/
-
-#define  FACTOR_SYSTICK_MS     ((TpUint32)8400)
-#define  FACTOR_MS_TO_US       ((TpUint32)1000)
-
- 
-static uint8_t  fac_us;  /* Microsecond delay times multiplier */
-static uint16_t fac_ms;  /* Millisecond delay times multiplier */
+#define Delay_TIM   TIM2  
 
 
-/****************************************************
- * Function:    Delay_Init
- * Description: Delay Configuration.
- * Input:
- * Output:
- * Return:
-*****************************************************/
-TpBool SystickInit(TpVoid)
-{
-  TpBool resutlt = INLIB_ERROR;
-  
-  SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
-  SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;  /* Disability SysTick counter */
-  fac_ms = SystemCoreClock/FACTOR_SYSTICK_MS;
-  fac_us = SystemCoreClock/FACTOR_SYSTICK_MS/FACTOR_MS_TO_US;
-  resutlt = INLIB_OK;
-  return resutlt;
-}
-/****************************************************
- * Function:    Delay_ms
- * Description: Millisecond latency.
- * Input:       nms
- * Output:
- * Return:
-*****************************************************/
-TpBool Delay_ms(u16 nms)
-{
-  TpBool resutlt = INLIB_ERROR;
-  TpUint32 temp;
-
-  SysTick->LOAD = (uint32_t)nms * fac_ms;   /* Time load (SysTick-> LOAD is 24bit) */
-  SysTick->VAL = 0x00;                      /* Empty counter */
-  SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk; /* Start the countdown */
-
-  do
-  {
-    temp = SysTick->CTRL;
-  }
-  while(temp&0x01 && !(temp&(1<<16)));        /* Wait time is reached */
-
-  SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;  /* Close Counter */
-  SysTick->VAL = 0x00;                        /* Empty counter */
-  
-  resutlt = INLIB_OK;
-  return resutlt;
-}
-
-/****************************************************
- * Function:    Delay_us
- * Description: Microsecond latency.
- * Input:		    nus
- * Output:
- * Return:
-*****************************************************/
-TpVoid Delay_us(TpUint32 nus)
-{
-  uint32_t temp;
-
-  SysTick->LOAD = nus * fac_us;             /* Time load (SysTick-> LOAD is 24bit) */
-  SysTick->VAL = 0x00;                      /* Empty counter */
-  SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk; /* Start the countdown */
-
-  do
-  {
-    temp = SysTick->CTRL;
-  }
-  while(temp&0x01 && !(temp&(1<<16)));        /* Wait time is reached */
-
-  SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;  /* Close Counter */
-  SysTick->VAL = 0x00;                        /* Empty counter */
-}
-
-/****************************************************
- * Function:    os_time_init
- * Description: For measuring the run time.
- * Input:
- * Output:
- * Return:
-*****************************************************/
 void os_time_init(void)
 {
   SysTick->LOAD = 0xffffff;                 /* Time load (SysTick-> LOAD is 24bit) */
@@ -109,15 +18,58 @@ void os_time_init(void)
   SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk; /* Start the countdown */
 }
 
-/****************************************************
+/****************************************************************
  * Function:    os_time_init
  * Description: For measuring the run time.
  * Input:
  * Output:
  * Return:		  Microsecond
-*****************************************************/
+*****************************************************************/
 float os_time(void)
 {
   SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;  /* Close Counter */
-  return (0xffffff - SysTick->VAL) / 10.5f;    /* Read counter */
+  return (0xffffff - SysTick->VAL) / 10.5f;   /* Read counter */
+}
+
+void DelayInit(void)
+{
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);  /* Enable TIM2 clock */
+
+  TIM_TimeBaseInitStructure.TIM_Prescaler = 4199;                    /* Specifies the prescaler value used to divide the TIM clock.(2 Division) */
+  TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up; /* Specifies the counter mode */
+  TIM_TimeBaseInitStructure.TIM_Period = 65535;                   /* Reload value	approximate 2.3KHz */
+  TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+  TIM_TimeBaseInit(Delay_TIM, &TIM_TimeBaseInitStructure);
+
+  TIM_ClearFlag(Delay_TIM, TIM_FLAG_Update);
+
+  TIM_Cmd(Delay_TIM, DISABLE);
+}
+
+void Delay_ms(uint32_t ms)
+{
+  uint16_t counter;
+  uint32_t tmp_ms = 0;
+  uint32_t tmp_5s_ms = 0;
+
+  TIM_SetCounter(Delay_TIM,0);
+  TIM_Cmd(Delay_TIM, ENABLE);
+  
+  do
+  {
+    counter = TIM_GetCounter(Delay_TIM);
+    
+    if(counter > 50000)
+    {
+      TIM_SetCounter(Delay_TIM,0);
+      tmp_5s_ms += 5000;
+    }
+    
+    tmp_ms = tmp_5s_ms + counter / 10;
+  }
+  while(tmp_ms < ms);
+   
+   TIM_Cmd(Delay_TIM, DISABLE);
 }
