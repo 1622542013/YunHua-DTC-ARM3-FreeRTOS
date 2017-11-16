@@ -16,6 +16,7 @@
 #include "usr_FreeRTOS.h"
 #include "TCP_user.h"
 
+
 void TaskCreatUser(void);
 void TaskGroupCreatUser(void);
 void TaskQueueCreatUser(void);
@@ -59,6 +60,7 @@ void TaskStart(void* pv)
       timer_tick ();
     
       time_count++;
+    
       u1_printf("时间： %d秒\r\n",time_count);
 
       vTaskDelayUntil(&xLastSYSTime, 1000);
@@ -96,17 +98,4 @@ void TaskCreatUser(void)
                2,                 /* 任务优先级*/
                &HandleTaskTCPnet); /* 任务句柄  */
 }
-
-void USART_ReceiveDataFinishCallback(USART_TypeDef* USARTx)
-{
-  int a = 0;
-  
-  if(USARTx == USART1)
-  {  
-      a ++;
-      a --;
-  }
-}
-
-
 

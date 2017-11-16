@@ -196,6 +196,7 @@ void USART_OUT(uint8_t USART_x, uint8_t* Buffer, uint16_t BufferSize);
 void USART_IN(uint8_t USART_x);
 uint16_t USART_GetReceiveDataNumber(uint8_t USART_x);
 
+void u1_printf(char* fmt,...);
 #ifdef __cplusplus
 }
 #endif  /* __cplusplus */
