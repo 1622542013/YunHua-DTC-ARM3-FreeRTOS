@@ -72,11 +72,13 @@ void TaskTCPnet(void* pv)
 {  
   TickType_t xLastSYSTime;
   
+  xLastSYSTime = xTaskGetTickCount();
+  
   while(1)
   {
       TcpNetTest();
  
-      vTaskDelayUntil(&xLastSYSTime, 1000);
+     // vTaskDelayUntil(&xLastSYSTime, 1000);
   }
 }
 
