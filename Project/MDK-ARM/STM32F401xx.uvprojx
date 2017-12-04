@@ -310,7 +310,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>4</Optim>
             <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -395,11 +395,6 @@
               <FilePath>..\..\USER\stm32f4xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>globals.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\USER\globals.c</FilePath>
-            </File>
-            <File>
               <FileName>usr_FreeRTOS.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\USER\usr_FreeRTOS.h</FilePath>
@@ -410,15 +405,20 @@
               <FilePath>..\..\Libraries\FreeRTOS\include\FreeRTOSConfig.h</FilePath>
             </File>
             <File>
-              <FileName>TCP_user.c</FileName>
+              <FileName>globals.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\TCP_user.c</FilePath>
+              <FilePath>..\..\USER\globals.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Peripherals</GroupName>
           <Files>
+            <File>
+              <FileName>lan8720.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\LAN8720\lan8720.c</FilePath>
+            </File>
             <File>
               <FileName>Sysclock.c</FileName>
               <FileType>1</FileType>
@@ -434,20 +434,32 @@
               <FileType>1</FileType>
               <FilePath>..\..\SYSTEM\USART\USART.c</FilePath>
             </File>
-            <File>
-              <FileName>lan8720.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\LAN8720\lan8720.c</FilePath>
-            </File>
-            <File>
-              <FileName>printf_usr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\Printf-usr\printf_usr.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>TASK</GroupName>
+          <Files>
+            <File>
+              <FileName>TCP_user.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\TASK\TCP_user.c</FilePath>
+            </File>
+            <File>
+              <FileName>Tcp_client1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\TASK\Tcp_client1.c</FilePath>
+            </File>
+            <File>
+              <FileName>Tcp_client2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\TASK\Tcp_client2.c</FilePath>
+            </File>
+            <File>
+              <FileName>Tcp_client3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\TASK\Tcp_client3.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>FreeRTOS/Source</GroupName>

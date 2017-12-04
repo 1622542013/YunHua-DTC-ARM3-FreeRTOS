@@ -29,7 +29,7 @@ TpInt32 main(TpVoid)
 
   HardWareInit(); 
   
-  	/* 初始化RL-TCPnet */
+ /* 初始化RL-TCPnet */
 	init_TcpNet ();
   
   TaskCreatUser();
@@ -45,7 +45,7 @@ TpInt32 main(TpVoid)
 }
 
 
-/*-----------任务--------------*/
+/*-----------------------TaskStart---------------------------*/
 TaskHandle_t HandleTaskStart = NULL;
 void TaskStart(void* pv)
 {  
@@ -53,32 +53,52 @@ void TaskStart(void* pv)
 
   TickType_t xLastSYSTime;
   
-  xLastSYSTime = xTaskGetTickCount();
+  xLastSYSTime = xTaskGetTickCount();/*读取此时时间*/
   
   while(1)
   {
-      timer_tick ();
-    
       time_count++;
     
-      u1_printf("时间： %d秒\r\n",time_count);
+      u1_printf("系统运行时间： %d秒\r\n",time_count);/*输出运行时间*/
 
-      vTaskDelayUntil(&xLastSYSTime, 1000);
+      vTaskDelayUntil(&xLastSYSTime, 1000);/*精准延时*/
+  }
+}
+/*-----------------------TaskTCPClient1---------------------------*/
+TaskHandle_t HandleTaskTCPClient1 = NULL;
+void TaskTCPClient1(void* pv)
+{  
+  while(1)
+  {
+      TcpClientTest1();
   }
 }
 
-TaskHandle_t HandleTaskTCPnet = NULL;
-void TaskTCPnet(void* pv)
+/*-----------------------TaskTCPClient2---------------------------*/
+TaskHandle_t HandleTaskTCPClient2 = NULL;
+void TaskTCPClient2(void* pv)
+{  
+  while(1)
+  {
+      TcpClientTest2();
+  }
+}
+/*-----------------------TaskSysTcik---------------------------*/
+TaskHandle_t HandleTaskSysTcik = NULL;
+void TaskSysTcik(void* pv)
 {  
   TickType_t xLastSYSTime;
   
-  xLastSYSTime = xTaskGetTickCount();
+  xLastSYSTime = xTaskGetTickCount();/*读取此时时间*/
   
   while(1)
   {
-      TcpNetTest();
- 
-     // vTaskDelayUntil(&xLastSYSTime, 1000);
+    timer_tick ();
+    
+    /* RL-TCPnet处理函数(需要一直调用，作用不明！？) */
+		main_TcpNet();
+    
+    vTaskDelayUntil(&xLastSYSTime, 100);/*精准延时*/
   }
 }
 
@@ -93,11 +113,25 @@ void TaskCreatUser(void)
                2,                 /* 任务优先级*/
                &HandleTaskStart); /* 任务句柄  */
   
-  xTaskCreate( TaskTCPnet,         /* 任务函数 */
-               "TaskTCPnet",       /* 任务名    */
+  xTaskCreate( TaskTCPClient1,         /* 任务函数 */
+               "TaskTCPClient1",       /* 任务名    */
                500,               /* 任务栈大小，单位：4字节 */
                NULL,              /* 任务参数  */
                2,                 /* 任务优先级*/
-               &HandleTaskTCPnet); /* 任务句柄  */
+               &HandleTaskTCPClient1); /* 任务句柄  */
+  
+  xTaskCreate( TaskTCPClient2,         /* 任务函数 */
+               "TaskTCPClient2",       /* 任务名    */
+               500,               /* 任务栈大小，单位：4字节 */
+               NULL,              /* 任务参数  */
+               2,                 /* 任务优先级*/
+               &HandleTaskTCPClient2); /* 任务句柄  */
+  
+  xTaskCreate( TaskSysTcik,         /* 任务函数 */
+               "TaskSysTime",       /* 任务名    */
+               50,               /* 任务栈大小，单位：4字节 */
+               NULL,              /* 任务参数  */
+               2,                 /* 任务优先级*/
+               &HandleTaskSysTcik); /* 任务句柄  */
 }
 
