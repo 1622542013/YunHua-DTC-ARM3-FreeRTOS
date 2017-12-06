@@ -1,6 +1,6 @@
 #include "TCP_user.h"
 
-/*TCP server socket 回调函数
+/*TCP socket 回调函数
 参数1：TCP socket 句柄
 参数2：事件类型
     TCP_EVT_CONREQ   远程客户端连接消息。
@@ -18,7 +18,7 @@
         参数3 ptr 是 远程IP
         参数4 par 是远程端口号    
 */
-U16 tcpserver_callback (U8 soc, U8 evt, U8 *ptr, U16 par)
+U16 tcp_callback (U8 soc, U8 evt, U8 *ptr, U16 par)
 {
 	switch (evt) 
 	{
@@ -59,29 +59,68 @@ U16 tcpserver_callback (U8 soc, U8 evt, U8 *ptr, U16 par)
 	}
 	return (0);
 }
-
-uint8_t TCP_Client_StatusCheck(uint8_t socket_fp,uint8_t ip[4],uint16_t server_portnum,uint16_t local_port_num) 
-{	
-	switch (tcp_get_state(socket_fp)) 
+uint8_t TCP_StatusCheck(TCP_status tcp) 
+{	 
+  uint8_t status = 0;
+  uint16_t  local_port = 0;
+  
+  if(tcp.mode == TCP_CLIENT)
+  {
+    local_port = tcp.client.local_port;
+  }
+  else if(tcp.mode == TCP_SERVER)
+  {
+    local_port = tcp.server.local_port;
+  }
+  
+  status = tcp_get_state(tcp.socket_fp);
+  
+	switch(status) 
 	{
 		case TCP_STATE_FREE:
+      u1_printf("tcp 句柄无效\r\n");break;
 		case TCP_STATE_CLOSED:
-			tcp_connect (socket_fp, ip, server_portnum, local_port_num);
-      u1_printf("尝试重新连接\r\n");
-			break;
-		
-		case TCP_STATE_LISTEN:
-			break;
-		
-		case TCP_STATE_CONNECT:
-      u1_printf("TCP连接以建立\r\n");
-			return (__TRUE);
+      if(tcp.mode == TCP_CLIENT)
+      {
+                      /*socket句柄  远程服务器ip    远程服务器端口          本地端口*/
+        tcp_connect (tcp.socket_fp, tcp.client.ip, tcp.client.remote_port, tcp.client.local_port);
+        u1_printf("TCP 客户端 %d 尝试 重新连接 --> 远程服务端\r\n",tcp.client.local_port);  
+      }
+      else if(tcp.mode == TCP_SERVER)
+      {
+        uint8_t res;
+        res = tcp_listen (tcp.socket_fp, tcp.client.local_port);
+        if(res == __TRUE)
+        {
+          u1_printf("tcp 服务端 监听 %d端口成功\r\n", tcp.server.local_port);
+        }
+        else
+        {
+          u1_printf("tcp 服务端 %d 监听 失败\r\n",tcp.server.local_port);
+        }       
+      }
+      else
+      {
+        u1_printf("tcp 模式未选择\r\n");
+      }
+			break;	
+      
+		case TCP_STATE_LISTEN:   u1_printf("Socket 等待连接中（%d 监听ing）\r\n",local_port);break; 
+    case TCP_STATE_SYN_REC:  u1_printf("%d 接收到SYN包\r\n",local_port);break;    
+    case TCP_STATE_SYN_SENT: u1_printf("%d 发送SYN包,建立连接\r\n",local_port);break;
+    case TCP_STATE_FINW1:    u1_printf("%d 发送FIN包，准备结束连接\r\n",local_port);break;
+    case TCP_STATE_FINW2:    u1_printf("%d 发送的 FIN 包已经收到远程机器的应答，当前正在等待远程机器发送 FIN 包\r\n",local_port);break;
+    case TCP_STATE_CLOSING:  u1_printf("%d 从远程机器收到 FIN 包。\r\n",local_port);break;
+    case TCP_STATE_LAST_ACK: u1_printf("%d 对于已经发出的 FIN 包，最后一次等待 ACK 应答。\r\n",local_port);break;
+    case TCP_STATE_TWAIT:    u1_printf("%d 关闭前等待 2ms。\r\n",local_port);break;
+    
+		case TCP_STATE_CONNECT:  u1_printf("TCP %d 连接已建立，可以通信\r\n",local_port);break;
 			
-		default:  
-			break;
+		default:  	break;	
 	}
-	
-	return (__FALSE);
+  
+  return  status;
 }
+
 
 

@@ -83,6 +83,16 @@ void TaskTCPClient2(void* pv)
       TcpClientTest2();
   }
 }
+
+/*-----------------------TaskTCPClient2---------------------------*/
+TaskHandle_t HandleTaskTCPServer = NULL;
+void TaskTCPServer(void* pv)
+{  
+  while(1)
+  {
+     // TcpServer();
+  }
+}
 /*-----------------------TaskSysTcik---------------------------*/
 TaskHandle_t HandleTaskSysTcik = NULL;
 void TaskSysTcik(void* pv)
@@ -108,7 +118,7 @@ void TaskCreatUser(void)
 { 
   xTaskCreate( TaskStart,         /* 任务函数 */
                "TaskStart",       /* 任务名    */
-               500,               /* 任务栈大小，单位：4字节 */
+               50,               /* 任务栈大小，单位：4字节 */
                NULL,              /* 任务参数  */
                2,                 /* 任务优先级*/
                &HandleTaskStart); /* 任务句柄  */
@@ -126,6 +136,13 @@ void TaskCreatUser(void)
                NULL,              /* 任务参数  */
                2,                 /* 任务优先级*/
                &HandleTaskTCPClient2); /* 任务句柄  */
+  
+  xTaskCreate( TaskTCPServer,         /* 任务函数 */
+               "TaskTCPServer",       /* 任务名    */
+               500,               /* 任务栈大小，单位：4字节 */
+               NULL,              /* 任务参数  */
+               2,                 /* 任务优先级*/
+               &HandleTaskTCPServer); /* 任务句柄  */
   
   xTaskCreate( TaskSysTcik,         /* 任务函数 */
                "TaskSysTime",       /* 任务名    */
