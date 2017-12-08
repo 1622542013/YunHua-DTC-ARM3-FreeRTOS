@@ -455,9 +455,14 @@
               <FilePath>..\..\SYSTEM\TASK\Tcp_client2.c</FilePath>
             </File>
             <File>
-              <FileName>Tcp_client3.c</FileName>
+              <FileName>Tcp_server.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\Tcp_client3.c</FilePath>
+              <FilePath>..\..\SYSTEM\TASK\Tcp_server.c</FilePath>
+            </File>
+            <File>
+              <FileName>UDP_user.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\TASK\UDP_user.c</FilePath>
             </File>
           </Files>
         </Group>

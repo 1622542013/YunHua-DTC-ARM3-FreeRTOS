@@ -70,7 +70,8 @@ void TaskTCPClient1(void* pv)
 {  
   while(1)
   {
-      TcpClientTest1();
+     // TcpClientTest1();
+     vTaskDelay(1000);
   }
 }
 
@@ -80,7 +81,8 @@ void TaskTCPClient2(void* pv)
 {  
   while(1)
   {
-      TcpClientTest2();
+     // TcpClientTest2();
+     vTaskDelay(1000);
   }
 }
 
@@ -91,6 +93,8 @@ void TaskTCPServer(void* pv)
   while(1)
   {
      // TcpServer();
+    // UDPnetTest();
+    BSDTCPnetTest();
   }
 }
 /*-----------------------TaskSysTcik---------------------------*/
@@ -123,25 +127,25 @@ void TaskCreatUser(void)
                2,                 /* 任务优先级*/
                &HandleTaskStart); /* 任务句柄  */
   
-  xTaskCreate( TaskTCPClient1,         /* 任务函数 */
-               "TaskTCPClient1",       /* 任务名    */
-               500,               /* 任务栈大小，单位：4字节 */
-               NULL,              /* 任务参数  */
-               2,                 /* 任务优先级*/
-               &HandleTaskTCPClient1); /* 任务句柄  */
-  
-  xTaskCreate( TaskTCPClient2,         /* 任务函数 */
-               "TaskTCPClient2",       /* 任务名    */
-               500,               /* 任务栈大小，单位：4字节 */
-               NULL,              /* 任务参数  */
-               2,                 /* 任务优先级*/
-               &HandleTaskTCPClient2); /* 任务句柄  */
+//  xTaskCreate( TaskTCPClient1,         /* 任务函数 */
+//               "TaskTCPClient1",       /* 任务名    */
+//               500,               /* 任务栈大小，单位：4字节 */
+//               NULL,              /* 任务参数  */
+//               2,                 /* 任务优先级*/
+//               &HandleTaskTCPClient1); /* 任务句柄  */
+//  
+//  xTaskCreate( TaskTCPClient2,         /* 任务函数 */
+//               "TaskTCPClient2",       /* 任务名    */
+//               500,               /* 任务栈大小，单位：4字节 */
+//               NULL,              /* 任务参数  */
+//               2,                 /* 任务优先级*/
+//               &HandleTaskTCPClient2); /* 任务句柄  */
   
   xTaskCreate( TaskTCPServer,         /* 任务函数 */
                "TaskTCPServer",       /* 任务名    */
-               500,               /* 任务栈大小，单位：4字节 */
+               1000,               /* 任务栈大小，单位：4字节 */
                NULL,              /* 任务参数  */
-               2,                 /* 任务优先级*/
+               4,                 /* 任务优先级*/
                &HandleTaskTCPServer); /* 任务句柄  */
   
   xTaskCreate( TaskSysTcik,         /* 任务函数 */

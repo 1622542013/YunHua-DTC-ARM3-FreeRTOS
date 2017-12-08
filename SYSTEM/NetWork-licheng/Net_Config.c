@@ -229,7 +229,7 @@
 //   <i> When this option is enabled, local IP address, Net Mask
 //   <i> and Default Gateway are obtained automatically from
 //   <i> the DHCP Server on local LAN.
-#define DHCP_ENABLE    0
+#define DHCP_ENABLE    1
 
 //     <s.40>Vendor Class Identifier
 //     <i> This value is optional. If specified, it is added
@@ -496,7 +496,7 @@
 //   <o>Number of UDP Sockets <1-20>
 //   <i> Number of available UDP sockets
 //   <i> Default: 5
-#define UDP_NUMSOCKS   2
+#define UDP_NUMSOCKS   5
 
 // </e>
 // <e>TCP Sockets
@@ -849,7 +849,7 @@
 // <e>BSD Socket Interface
 // =======================
 // <i> Enable or disable Berkeley Socket Programming Interface
-#define BSD_ENABLE     0
+#define BSD_ENABLE     1
 
 //   <o>Number of BSD Sockets <1-20>
 //   <i> Number of available Berkeley Sockets
@@ -866,7 +866,7 @@
 //   <i> A timeout for socket receive in blocking mode.
 //   <i> Timeout value of 0 means indefinite timeout.
 //   <i> Default: 20
-#define BSD_RCVTOUT    20
+#define BSD_RCVTOUT    0
 
 //   <q>Hostname Resolver
 //   <i> Enable or disable Berkeley style hostname resolver.
