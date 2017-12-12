@@ -43,7 +43,7 @@
 #define configTICK_RATE_HZ				( ( TickType_t ) 1000)       /**< 定义系统时钟节拍  1MHZ */
 #define configMAX_PRIORITIES			( 5 )                         /**< 定义系统最大优先级数，定义为5 ，则可使用优先级0，1，2，3，4，不包含5 */
 #define configMINIMAL_STACK_SIZE	( ( uint32_t ) 130 )    /**< 定义系统空闲任务堆大小 */
-#define configTOTAL_HEAP_SIZE			( ( size_t ) ( 20 * 1024 ) )  /**< 定义系统任务堆大小 */
+#define configTOTAL_HEAP_SIZE			( ( size_t ) ( 40 * 1024 ) )  /**< 定义系统任务堆大小 */
 #define configMAX_TASK_NAME_LEN		( 16 )                        /**< 定义系统任务名最大字节数,结束符也包含在内*/
 #define configUSE_TRACE_FACILITY		1 /**< 要配置显示栈的使用情况 。置1，使能 vTaskList() 和 vTaskGetRunTimeStats() */ 
 #define configUSE_16_BIT_TICKS			0 /**< 定义TickType_t字节数，0即24位(定义32位变量，只用低24位)（32位单片机使用），1即16位(定义16位变量，只用低8位)*/

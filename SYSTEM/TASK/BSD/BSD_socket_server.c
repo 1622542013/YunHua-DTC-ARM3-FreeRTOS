@@ -59,7 +59,7 @@ void BSDTCPnetTest(void)
 		   第2个参数SOCK_STREAM：表示数据流通信类型，即使用的TCP。
 		   第3个参数0 ：配置为0的话，自动跟第2个参数进行协议匹配，这里就是TCP协议。
 		*/
-		sock = socket (AF_INET, SOCK_STREAM, 0);/*返回值：socket句柄*/
+		sock = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);/*返回值：socket句柄*/
 
 		/* 端口号设置为1001 */
 		addr.sin_port        = htons(LocalPort_NUM);

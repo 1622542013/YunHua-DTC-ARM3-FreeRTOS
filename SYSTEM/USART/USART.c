@@ -1109,15 +1109,23 @@ uint16_t USART_GetReceiveDataNumber(uint8_t USART_x)
 
 #include <stdarg.h>
 #include <stdio.h>
+#include "usr_FreeRTOS.h"
+extern SemaphoreHandle_t  xMutex;
+
 void u1_printf(char* fmt,...)  
-{  
+{ 
+  /* ª•≥‚–≈∫≈¡ø */
+  xSemaphoreTake(xMutex, portMAX_DELAY);
+
   static char buff[USART1_BufferSize_Tx];
+
+  memset(buff,0,USART1_BufferSize_Tx);
+  va_list ap;
+  va_start(ap,fmt);
+  vsprintf((char*)buff,fmt,ap);
+  va_end(ap);
+
+  USART_OUT(USART_1, (uint8_t*)buff, strlen(buff));
   
-    memset(buff,0,USART1_BufferSize_Tx);
-    va_list ap;
-    va_start(ap,fmt);
-    vsprintf((char*)buff,fmt,ap);
-    va_end(ap);
-  
-    USART_OUT(USART_1, (uint8_t*)buff, strlen(buff));
+  xSemaphoreGive(xMutex); 
 }

@@ -866,7 +866,7 @@
 //   <i> A timeout for socket receive in blocking mode.
 //   <i> Timeout value of 0 means indefinite timeout.
 //   <i> Default: 20
-#define BSD_RCVTOUT    0
+#define BSD_RCVTOUT    20
 
 //   <q>Hostname Resolver
 //   <i> Enable or disable Berkeley style hostname resolver.

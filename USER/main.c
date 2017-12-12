@@ -7,20 +7,20 @@
 /*                               Header include                               */
 /*============================================================================*/
 
+#include "usr_FreeRTOS.h"
+
 #include "config.h"
 #include "stm32f4xx_it.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "usr_FreeRTOS.h"
 #include "TCP_user.h"
-
 
 void TaskCreatUser(void);
 void TaskGroupCreatUser(void);
 void TaskQueueCreatUser(void);
-
+void SemaphoreCreat(void);
 TpInt32 main(TpVoid)
 {
 	/* Tim,Usart.. config*/ 
@@ -28,11 +28,12 @@ TpInt32 main(TpVoid)
   /* 创建任务*/
 
   HardWareInit(); 
-  
- /* 初始化RL-TCPnet */
-	init_TcpNet ();
-  
+ 
+  SemaphoreCreat();
   TaskCreatUser();
+  
+   /* 初始化RL-TCPnet */
+	init_TcpNet ();
 
   /* 启动调度，开始执行任务 */
   vTaskStartScheduler();
@@ -82,7 +83,9 @@ void TaskTCPClient2(void* pv)
   while(1)
   {
      // TcpClientTest2();
-     vTaskDelay(1000);
+        /* RL-TCPnet处理函数(需要一直调用，作用不明！？) */
+		 main_TcpNet();
+     vTaskDelay(2);
   }
 }
 
@@ -108,10 +111,7 @@ void TaskSysTcik(void* pv)
   while(1)
   {
     timer_tick ();
-    
-    /* RL-TCPnet处理函数(需要一直调用，作用不明！？) */
-		main_TcpNet();
-    
+
     vTaskDelayUntil(&xLastSYSTime, 100);/*精准延时*/
   }
 }
@@ -122,9 +122,9 @@ void TaskCreatUser(void)
 { 
   xTaskCreate( TaskStart,         /* 任务函数 */
                "TaskStart",       /* 任务名    */
-               50,               /* 任务栈大小，单位：4字节 */
+               100,               /* 任务栈大小，单位：4字节 */
                NULL,              /* 任务参数  */
-               2,                 /* 任务优先级*/
+               1,                 /* 任务优先级*/
                &HandleTaskStart); /* 任务句柄  */
   
 //  xTaskCreate( TaskTCPClient1,         /* 任务函数 */
@@ -133,26 +133,31 @@ void TaskCreatUser(void)
 //               NULL,              /* 任务参数  */
 //               2,                 /* 任务优先级*/
 //               &HandleTaskTCPClient1); /* 任务句柄  */
-//  
-//  xTaskCreate( TaskTCPClient2,         /* 任务函数 */
-//               "TaskTCPClient2",       /* 任务名    */
-//               500,               /* 任务栈大小，单位：4字节 */
-//               NULL,              /* 任务参数  */
-//               2,                 /* 任务优先级*/
-//               &HandleTaskTCPClient2); /* 任务句柄  */
   
   xTaskCreate( TaskTCPServer,         /* 任务函数 */
-               "TaskTCPServer",       /* 任务名    */
-               1000,               /* 任务栈大小，单位：4字节 */
+             "TaskTCPServer",       /* 任务名    */
+             512,               /* 任务栈大小，单位：4字节 */
+             NULL,              /* 任务参数  */
+             1,                 /* 任务优先级*/
+             &HandleTaskTCPServer); /* 任务句柄  */
+  
+  xTaskCreate( TaskTCPClient2,         /* 任务函数 */
+               "TaskTCPClient2",       /* 任务名    */
+               50,               /* 任务栈大小，单位：4字节 */
                NULL,              /* 任务参数  */
-               4,                 /* 任务优先级*/
-               &HandleTaskTCPServer); /* 任务句柄  */
+               1,                 /* 任务优先级*/
+               &HandleTaskTCPClient2); /* 任务句柄  */
   
   xTaskCreate( TaskSysTcik,         /* 任务函数 */
                "TaskSysTime",       /* 任务名    */
-               50,               /* 任务栈大小，单位：4字节 */
+               30,               /* 任务栈大小，单位：4字节 */
                NULL,              /* 任务参数  */
-               2,                 /* 任务优先级*/
+               1,                 /* 任务优先级*/
                &HandleTaskSysTcik); /* 任务句柄  */
 }
 
+SemaphoreHandle_t  xMutex = NULL;
+void SemaphoreCreat()
+{
+  xMutex = xSemaphoreCreateMutex();
+}

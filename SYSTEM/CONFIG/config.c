@@ -141,7 +141,7 @@ void TIM_Configuration(void)
 
 void HardWareInit(TpVoid)
 {
-  SysClockInit(); 
+  //SysClockInit(); 
   DelayInit();
   KEY_Init();
   USART_Init_Usr();

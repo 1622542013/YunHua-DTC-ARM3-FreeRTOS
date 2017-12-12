@@ -12,7 +12,7 @@
 #include "queue.h"
 #include "croutine.h"
 #include "event_groups.h"
-
+#include "semphr.h"
 #include <Net_Config.h>
 
 #endif
