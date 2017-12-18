@@ -16,7 +16,7 @@
 *********************************************************************************************************
 */
 /* RL-TCPnet APIµÄ·µ»ØÖµ */
-const char * ReVal_Table[]= 
+const static char * ReVal_Table[]= 
 {
 	" 0: SCK_SUCCESS       Success                             ",
 	"-1: SCK_ERROR         General Error                       ",
@@ -31,7 +31,7 @@ const char * ReVal_Table[]=
 	"-10: SCK_ENONAME      Host Name not existing              ",
 };
 
-uint8_t sendbuf[1024];
+static uint8_t sendbuf[1024];
 
 
 /*

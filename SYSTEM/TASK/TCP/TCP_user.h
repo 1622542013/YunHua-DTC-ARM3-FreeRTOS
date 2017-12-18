@@ -27,7 +27,6 @@
 #define TCP_CLIENT     2
 
 
-
 /*============================================================================*/
 /*                                   Macros                                   */
 /*============================================================================*/
@@ -76,11 +75,12 @@ uint8_t TCP_StatusCheck(TCP_status tcp_sta);
 void TcpClientTest1(void);
 void TcpClientTest2(void);
 void TcpServer(void);
-  
+
 void UDPnetTest(void);
-  
+
 void BSDTCPnetTest(void);
-  
+void BSDSocketClientTest(void);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

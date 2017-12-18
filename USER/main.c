@@ -92,7 +92,8 @@ void TaskTCPServer(void* pv)
 {  
   while(1)
   {
-    BSDTCPnetTest();
+   // BSDTCPnetTest();
+		BSDSocketClientTest();
   }
 }
 /*-----------------------TaskSysTcik---------------------------*/
@@ -131,7 +132,7 @@ void TaskCreatUser(void)
   
   xTaskCreate( TaskTCPServer,         /* 任务函数 */
              "TaskTCPServer",       /* 任务名    */
-             512,               /* 任务栈大小，单位：4字节 */
+             2048,               /* 任务栈大小，单位：4字节 */
              NULL,              /* 任务参数  */
              1,                 /* 任务优先级*/
              &HandleTaskTCPServer); /* 任务句柄  */
