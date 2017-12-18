@@ -177,8 +177,6 @@ void BSDTCPnetTest(void)
 		   溢出时间到，远程设备断开连接等，程序都会执行到这里，我们在这里关闭socket，
 		   程序返回到第一个大while循环的开头重新创建socket并监听。
 		*/
-		closesocket (sock);
-    
-   
+		closesocket (sock);  
 	}
 }

@@ -45,7 +45,6 @@ TpInt32 main(TpVoid)
    while(1);		
 }
 
-
 /*-----------------------TaskStart---------------------------*/
 TaskHandle_t HandleTaskStart = NULL;
 void TaskStart(void* pv)
@@ -71,7 +70,6 @@ void TaskTCPClient1(void* pv)
 {  
   while(1)
   {
-     // TcpClientTest1();
      vTaskDelay(1000);
   }
 }
@@ -82,8 +80,7 @@ void TaskTCPClient2(void* pv)
 {  
   while(1)
   {
-     // TcpClientTest2();
-        /* RL-TCPnet处理函数(需要一直调用，作用不明！？) */
+    /* RL-TCPnet处理函数(需要一直调用，作用不明！？) */
 		 main_TcpNet();
      vTaskDelay(2);
   }
@@ -95,8 +92,6 @@ void TaskTCPServer(void* pv)
 {  
   while(1)
   {
-     // TcpServer();
-    // UDPnetTest();
     BSDTCPnetTest();
   }
 }
@@ -127,12 +122,12 @@ void TaskCreatUser(void)
                1,                 /* 任务优先级*/
                &HandleTaskStart); /* 任务句柄  */
   
-//  xTaskCreate( TaskTCPClient1,         /* 任务函数 */
-//               "TaskTCPClient1",       /* 任务名    */
-//               500,               /* 任务栈大小，单位：4字节 */
-//               NULL,              /* 任务参数  */
-//               2,                 /* 任务优先级*/
-//               &HandleTaskTCPClient1); /* 任务句柄  */
+  xTaskCreate( TaskTCPClient1,         /* 任务函数 */
+               "TaskTCPClient1",       /* 任务名    */
+               500,               /* 任务栈大小，单位：4字节 */
+               NULL,              /* 任务参数  */
+               2,                 /* 任务优先级*/
+               &HandleTaskTCPClient1); /* 任务句柄  */
   
   xTaskCreate( TaskTCPServer,         /* 任务函数 */
              "TaskTCPServer",       /* 任务名    */
