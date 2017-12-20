@@ -107,13 +107,8 @@ U16 udp_callback(U8 socket, U8 *remip, U16 remport, U8 *buf, U16 len)
 */
 void UDPnetTest(void)
 {  
-	int32_t iCount;
 	uint8_t *sendbuf;
-	uint8_t res;
-	const TickType_t xTicksToWait = 2; /* 延迟2ms */
-	EventBits_t uxBits;
-	
-	
+
 	/* 获取一个UDP Socket  */
 	udp_soc = udp_get_socket (0, UDP_OPT_SEND_CS | UDP_OPT_CHK_CS, udp_callback);
 	if (udp_soc != 0) 
@@ -147,7 +142,7 @@ void UDPnetTest(void)
       sendbuf[6] = '7';
       sendbuf[7] = '8';
       
-      res = udp_send (udp_soc, Rem_IP, PORT_NUM, sendbuf, 8);
+      udp_send (udp_soc, Rem_IP, PORT_NUM, sendbuf, 8);
     }
 
     vTaskDelay(1000);

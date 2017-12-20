@@ -32,6 +32,8 @@
 	extern uint32_t SystemCoreClock;
 #endif
 
+
+
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()    (ulHighFrequencyTimerTicks = 0ul)
 #define portGET_RUN_TIME_COUNTER_VALUE()            ulHighFrequencyTimerTicks
 #define configUSE_STATS_FORMATTING_FUNCTIONS        1
@@ -63,8 +65,8 @@
 
 /* Software timer definitions. */
 #define configUSE_TIMERS				1   /**< 使能软件定时器 */
-#define configTIMER_TASK_PRIORITY		( 2 ) /**< 软件定时器任务优先级 */
-#define configTIMER_QUEUE_LENGTH		10 /**< 配置软件定时器命令队列长度 */
+#define configTIMER_TASK_PRIORITY		( 4 ) /**< 软件定时器任务优先级 */
+#define configTIMER_QUEUE_LENGTH		20 /**< 配置软件定时器命令队列长度 */
 #define configTIMER_TASK_STACK_DEPTH	( configMINIMAL_STACK_SIZE * 2 )/**< 配置软件定时器任务 栈空间大小 */
 
 /* Set the following definitions to 1 to include the API function, or zero
@@ -77,6 +79,8 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelayUntil			  1
 #define INCLUDE_vTaskDelay				  1
 #define INCLUDE_xTimerPendFunctionCall  1
+#define INCLUDE_xEventGroupSetBitFromISR  1
+
 /* Cortex-M specific definitions. */
 #ifdef __NVIC_PRIO_BITS
 	/* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */

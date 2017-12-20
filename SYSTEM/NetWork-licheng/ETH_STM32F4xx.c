@@ -24,7 +24,7 @@
 #include "stdio.h"
 #include "USART.h"
 
-
+#include "usr_FreeRTOS.h"
 /*
 *********************************************************************************************************
 *	                  	STM32-V5开发板使用的是RMII接口，PHY芯片是DM9161/9162                            
@@ -183,7 +183,6 @@ void init_ethernet (void)
   
   GPIO_ResetBits(GPIOD, GPIO_Pin_3);
   
-   
   Delay_ms(50);
    
   GPIO_SetBits(GPIOD, GPIO_Pin_3);
@@ -379,7 +378,7 @@ void init_ethernet (void)
 	ETH->DMAIER = ETH_DMAIER_NISE | ETH_DMAIER_AISE | ETH_DMAIER_RBUIE | ETH_DMAIER_RIE;
 
 	/* 设置为最高优先级，仅调用NVIC->ISER设置的默认优先级也是最高优先级0 */
-	NVIC_SetPriority(ETH_IRQn, 0);
+	NVIC_SetPriority(ETH_IRQn, 1);
 	
   u1_printf("初始化完成\r\n");
 
@@ -465,6 +464,8 @@ void send_frame (OS_FRAME *frame)
                     进行置位。如果该描述符可用，则发送会继续进行。	   
 	*/
 	ETH->DMATPDR = 0;
+	
+	xEventGroupSetBits(Main_tcpnet_group,MAIN_TCP);
 }
 
 /*
@@ -583,6 +584,17 @@ void ETH_IRQHandler (void)
 	                       此位指示帧接收已完成，具体的帧状态信息已经包含在描述符中，接收仍保持运行状态。
 	*/
 	ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_AIS | ETH_DMASR_RS;
+	
+	
+	BaseType_t set_maintcp_status;
+	BaseType_t isr_group = pdFALSE;
+	
+	set_maintcp_status = xEventGroupSetBitsFromISR(Main_tcpnet_group,0x0001,&isr_group);
+	
+	if(set_maintcp_status != pdFALSE)
+	{
+		portYIELD_FROM_ISR(isr_group);
+	}
 }
 
 /*

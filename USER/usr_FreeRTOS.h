@@ -15,4 +15,8 @@
 #include "semphr.h"
 #include <Net_Config.h>
 
+/*创建事件标志组，提高RL效率，及时调用main_TcpNet();*/
+#define MAIN_TCP   (1<<0)
+extern  EventGroupHandle_t Main_tcpnet_group;
+
 #endif
