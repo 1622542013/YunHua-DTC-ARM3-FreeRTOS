@@ -55,7 +55,7 @@
 #define configCHECK_FOR_STACK_OVERFLOW	0 /**< 栈溢出，检测方法。2：方法2 ; 1：方法1 ; 0:禁止栈溢出检测 */
 #define configUSE_RECURSIVE_MUTEXES		  1
 #define configUSE_MALLOC_FAILED_HOOK	  0 /**< 使能malloc失败的钩子函数 */
-#define configUSE_APPLICATION_TASK_TAG	  0
+#define configUSE_APPLICATION_TASK_TAG	0
 #define configUSE_COUNTING_SEMAPHORES	  1 /**< 使能计数信号量 */
 #define configGENERATE_RUN_TIME_STATS	  1 /**< 使能任务运行状态参数统计 */
 
@@ -64,21 +64,21 @@
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
 
 /* Software timer definitions. */
-#define configUSE_TIMERS				1   /**< 使能软件定时器 */
-#define configTIMER_TASK_PRIORITY		( 4 ) /**< 软件定时器任务优先级 */
-#define configTIMER_QUEUE_LENGTH		20 /**< 配置软件定时器命令队列长度 */
+#define configUSE_TIMERS							1   /**< 使能软件定时器 */
+#define configTIMER_TASK_PRIORITY			( 4 ) /**< 软件定时器任务优先级 */
+#define configTIMER_QUEUE_LENGTH			20 /**< 配置软件定时器命令队列长度 */
 #define configTIMER_TASK_STACK_DEPTH	( configMINIMAL_STACK_SIZE * 2 )/**< 配置软件定时器任务 栈空间大小 */
 
 /* Set the following definitions to 1 to include the API function, or zero
 to exclude the API function. */
-#define INCLUDE_vTaskPrioritySet		  1
-#define INCLUDE_uxTaskPriorityGet		  1
-#define INCLUDE_vTaskDelete				  1
-#define INCLUDE_vTaskCleanUpResources	  0
-#define INCLUDE_vTaskSuspend			  1
-#define INCLUDE_vTaskDelayUntil			  1
-#define INCLUDE_vTaskDelay				  1
-#define INCLUDE_xTimerPendFunctionCall  1
+#define INCLUDE_vTaskPrioritySet		  		1
+#define INCLUDE_uxTaskPriorityGet		  		1
+#define INCLUDE_vTaskDelete				  			1
+#define INCLUDE_vTaskCleanUpResources	  	0
+#define INCLUDE_vTaskSuspend			  			1
+#define INCLUDE_vTaskDelayUntil			  		1
+#define INCLUDE_vTaskDelay				  			1
+#define INCLUDE_xTimerPendFunctionCall  	1
 #define INCLUDE_xEventGroupSetBitFromISR  1
 
 /* Cortex-M specific definitions. */
@@ -105,7 +105,7 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-	
+
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
 #define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }	

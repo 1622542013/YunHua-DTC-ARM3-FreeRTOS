@@ -12,7 +12,6 @@
 
 #include "stm32f4xx.h"
 #include "globals.h"
-#include "usart.h"
 
 
 

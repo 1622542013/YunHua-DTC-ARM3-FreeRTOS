@@ -6,35 +6,60 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "TCP_user.h"
 
 void TaskCreatUser(void);
 void TaskGroupCreat(void);
 void SemaphoreCreat(void);
+uint8_t send_bf[100] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
 
 TpInt32 main(TpVoid)
 {
-	/* Tim,Usart.. config*/ 
-  __set_PRIMASK(1);
+//  __set_PRIMASK(1);
   /* 创建任务*/
 
   HardWareInit(); 
- 
-  SemaphoreCreat();
-  TaskCreatUser();
-	TaskGroupCreat();
-  
-   /* 初始化RL-TCPnet */
-	init_TcpNet ();
 
-  /* 启动调度，开始执行任务 */
-  vTaskStartScheduler();
-   /*
-     系统不会运行到这里，
-     如果运行到这里，有可能是堆空间不够使用导致
-     #define configTOTAL_HEAP_SIZE        ( ( size_t ) ( 17 * 1024 ) )
-   */
-   while(1);		
+//  SemaphoreCreat();
+//  TaskCreatUser();
+//  TaskGroupCreat();
+
+//  /* 启动调度，开始执行任务 */
+//  vTaskStartScheduler();
+  /*
+   系统不会运行到这里，
+   如果运行到这里，有可能是堆空间不够使用导致
+  */
+  while(1);		
+}
+
+/*-----------------------Task appstatus---------------------------*/
+TaskHandle_t HandleTaskappstatus;
+TickType_t  uxArraySize;
+TickType_t  uxArraySizer;
+TaskStatus_t task_status[8];
+TickType_t  ulTotalRunTime;
+
+
+
+void Taskappstatus(void* pv)
+{  
+  TickType_t xLastSYSTime;
+
+  xLastSYSTime = xTaskGetTickCount();/*读取此时时间*/
+	
+	 /* 获取任务总数目*/  
+  uxArraySize = uxTaskGetNumberOfTasks ();  
+  
+  while(1)
+  {
+		  /*获取每个任务的状态信息 */  
+      uxArraySizer = uxTaskGetSystemState( task_status, uxArraySize,&ulTotalRunTime );  
+		
+//      u1_printf("系统运行时间： %d秒\r\n");/*输出运行时间*/
+
+
+      vTaskDelayUntil(&xLastSYSTime, 1000);/*精准延时*/
+  }
 }
 
 /*-----------------------TaskStart---------------------------*/
@@ -51,7 +76,7 @@ void TaskStart(void* pv)
   {
       time_count++;
     
-      u1_printf("系统运行时间： %d秒\r\n",time_count);/*输出运行时间*/
+//      u1_printf("系统运行时间： %d秒\r\n",time_count);/*输出运行时间*/
 
       vTaskDelayUntil(&xLastSYSTime, 1000);/*精准延时*/
   }
@@ -72,10 +97,7 @@ void TaskMainTcp(void* pv)
 {  
   while(1)
   {
-		xEventGroupWaitBits(Main_tcpnet_group,MAIN_TCP,pdTRUE,pdFALSE,portMAX_DELAY);
-		
-    /* RL-TCPnet处理函数(需要一直调用，作用不明！？) */
-		 while(main_TcpNet() == __TRUE);
+    
   }
 }
 
@@ -85,8 +107,7 @@ void TaskTCPServer(void* pv)
 {  
   while(1)
   {
-   // BSDTCPnetTest();
-		BSDSocketClientTest();
+    
   }
 }
 /*-----------------------TaskSysTcik---------------------------*/
@@ -99,9 +120,6 @@ void TaskSysTcik(void* pv)
   
   while(1)
   {
-    timer_tick ();
-		
-		xEventGroupSetBits(Main_tcpnet_group,MAIN_TCP);
 
     vTaskDelayUntil(&xLastSYSTime, 100);/*精准延时*/
   }
@@ -111,6 +129,13 @@ void TaskSysTcik(void* pv)
 
 void TaskCreatUser(void)
 { 
+   xTaskCreate( Taskappstatus,         /* 任务函数 */
+               "Taskappstatus",       /* 任务名    */
+               500,               /* 任务栈大小，单位：4字节 */
+               NULL,              /* 任务参数  */
+               1,                 /* 任务优先级*/
+               &HandleTaskappstatus); /* 任务句柄  */
+	
   xTaskCreate( TaskStart,         /* 任务函数 */
                "TaskStart",       /* 任务名    */
                100,               /* 任务栈大小，单位：4字节 */

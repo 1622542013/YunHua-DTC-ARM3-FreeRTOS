@@ -10,8 +10,7 @@
       <TargetName>STM32F401xx</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
-      <uAC6>0</uAC6>
+      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407ZGTx</Device>
@@ -80,7 +79,7 @@
             <nStopB2X>0</nStopB2X>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>1</RunUserProg1>
+            <RunUserProg1>0</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
             <UserProg1Name>C:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin -o  ..\MDK-ARM\Output\STM32F401xx.bin ..\MDK-ARM\Output\STM32F401xx.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
@@ -336,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,__RTX</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\USER;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\NetWork-licheng;..\..\SYSTEM\LAN8720;..\..\Libraries\STM32F4xx_StdPeriph_Driver\STM32F4x7_ETH_Driver\inc;..\..\SYSTEM\Printf-usr;..\..\SYSTEM\TASK\TCP</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\USER;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\NetWork-licheng;..\..\SYSTEM\LAN8720;..\..\Libraries\STM32F4xx_StdPeriph_Driver\STM32F4x7_ETH_Driver\inc;..\..\SYSTEM\Printf-usr;..\..\SYSTEM\TASK\TCP;..\..\SYSTEM\USART</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -410,16 +409,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\USER\globals.c</FilePath>
             </File>
+            <File>
+              <FileName>usart_FreeRTOS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\USER\usart_FreeRTOS.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Peripherals</GroupName>
           <Files>
-            <File>
-              <FileName>lan8720.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\LAN8720\lan8720.c</FilePath>
-            </File>
             <File>
               <FileName>Sysclock.c</FileName>
               <FileType>1</FileType>
@@ -431,49 +430,34 @@
               <FilePath>..\..\SYSTEM\DELAY\delay.c</FilePath>
             </File>
             <File>
-              <FileName>USART.c</FileName>
+              <FileName>usart1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\USART\USART.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>TASK</GroupName>
-          <Files>
-            <File>
-              <FileName>BSD_socket_client.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\BSD\BSD_socket_client.c</FilePath>
+              <FilePath>..\..\SYSTEM\USART\usart1.c</FilePath>
             </File>
             <File>
-              <FileName>BSD_socket_server.c</FileName>
+              <FileName>usart2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\BSD\BSD_socket_server.c</FilePath>
+              <FilePath>..\..\SYSTEM\USART\usart2.c</FilePath>
             </File>
             <File>
-              <FileName>Tcp_client1.c</FileName>
+              <FileName>usart3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\TCP\Tcp_client1.c</FilePath>
+              <FilePath>..\..\SYSTEM\USART\usart3.c</FilePath>
             </File>
             <File>
-              <FileName>Tcp_client2.c</FileName>
+              <FileName>usart4.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\TCP\Tcp_client2.c</FilePath>
+              <FilePath>..\..\SYSTEM\USART\usart4.c</FilePath>
             </File>
             <File>
-              <FileName>Tcp_server.c</FileName>
+              <FileName>usart5.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\TCP\Tcp_server.c</FilePath>
+              <FilePath>..\..\SYSTEM\USART\usart5.c</FilePath>
             </File>
             <File>
-              <FileName>TCP_user.c</FileName>
+              <FileName>usart6.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\TCP\TCP_user.c</FilePath>
-            </File>
-            <File>
-              <FileName>UDP_user.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\TASK\UDP\UDP_user.c</FilePath>
+              <FilePath>..\..\SYSTEM\USART\usart6.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -639,41 +623,6 @@
               <FileName>stm32f4x7_eth.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Libraries\STM32F4xx_StdPeriph_Driver\STM32F4x7_ETH_Driver\src\stm32f4x7_eth.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>NetWork-licheng</GroupName>
-          <Files>
-            <File>
-              <FileName>ETH_STM32F4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\NetWork-licheng\ETH_STM32F4xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>ETH_STM32F4xx.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\SYSTEM\NetWork-licheng\ETH_STM32F4xx.h</FilePath>
-            </File>
-            <File>
-              <FileName>Net_Config.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\NetWork-licheng\Net_Config.c</FilePath>
-            </File>
-            <File>
-              <FileName>Net_Debug.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\NetWork-licheng\Net_Debug.c</FilePath>
-            </File>
-            <File>
-              <FileName>Net_lib.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\SYSTEM\NetWork-licheng\Net_lib.c</FilePath>
-            </File>
-            <File>
-              <FileName>TCPD_CM3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\SYSTEM\NetWork-licheng\TCPD_CM3.lib</FilePath>
             </File>
           </Files>
         </Group>

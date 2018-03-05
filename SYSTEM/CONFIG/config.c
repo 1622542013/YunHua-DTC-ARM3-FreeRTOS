@@ -9,8 +9,14 @@
 
 #include "config.h"
 #include "Sysclock.h"
-#include "USART.h"
 #include "delay.h"
+
+#include "usart1.h"
+#include "usart2.h"
+#include "usart3.h"
+#include "usart4.h"
+#include "usart5.h"
+#include "usart6.h"
 
 /*============================================================================*/
 /*                              Global variables                              */
@@ -19,55 +25,14 @@
 /*============================================================================*/
 /*                            Function definition                             */
 /*============================================================================*/
-void KEY_Init(void)
-{
-	
-	GPIO_InitTypeDef  GPIO_InitStructure;
-
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOE, ENABLE);//使能GPIOA,GPIOE时钟
- 
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4; //KEY0 KEY1 KEY2对应引脚
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;//普通输入模式
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100M
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
-  GPIO_Init(GPIOE, &GPIO_InitStructure);//初始化GPIOE2,3,4
-	
-	 
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;//WK_UP对应引脚PA0
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN ;//下拉
-  GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化GPIOA0
- 
-}
-
-void ExtiInit(void)
-{
-  EXTI_InitTypeDef EXTI_InitStructure;
-  GPIO_InitTypeDef GPIO_InitStructure;
-
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);   /* Enable GPIOA clock */
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);  /* Enable SYSCFG clock */
-
-  /* Configure PA1 pin as input floating */
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-  /* Connect EXTI Line1 to PA1 pin */
-  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource1);
-
-  EXTI_InitStructure.EXTI_Line = EXTI_Line1;
-  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-  EXTI_Init(&EXTI_InitStructure);
-}
-
 void USART_Init_Usr()
 {
-   USART_Configuration(USART_1, BAUD_RATE_230400, USART_Mode_Tx|USART_Mode_Rx, USART_IT_IDLE, USART_DMAReq_Tx|USART_DMAReq_Rx);
-   USART_DMA_TX_Configuration(USART_1, (uint32_t)USART1_Buffer_Tx, USART1_BufferSize_Tx);
-   USART_DMA_RX_Configuration(USART_1, (uint32_t)USART1_Buffer_Rx, USART1_BufferSize_Rx);
+   USART1_Init(9600,USART_IT_IDLE,ENABLE);
+   USART2_Init(9600,USART_IT_IDLE|USART_IT_TC,ENABLE);
+   USART3_Init(9600,USART_IT_IDLE,ENABLE);
+   UART4_Init(9600,USART_IT_IDLE,ENABLE);
+   UART5_Init(9600,USART_IT_IDLE,ENABLE);
+   USART6_Init(9600,USART_IT_IDLE,ENABLE);
 }
 
 TpVoid NVIC_Config(TpVoid)
@@ -76,37 +41,37 @@ TpVoid NVIC_Config(TpVoid)
 	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 	
-	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure); 
-  
-  NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure); 
-  
-  NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x01;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-  NVIC_InitStructure.NVIC_IRQChannel = DMA1_Stream3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
-  NVIC_InitStructure.NVIC_IRQChannel = DMA1_Stream0_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x03;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-
   NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = UART4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = UART5_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = USART6_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -141,9 +106,6 @@ void TIM_Configuration(void)
 
 void HardWareInit(TpVoid)
 {
-  //SysClockInit(); 
-  DelayInit();
-  KEY_Init();
   USART_Init_Usr();
   NVIC_Config();
 }

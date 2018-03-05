@@ -36,7 +36,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 #include "definition.h"
-#include "usart.h"
 #include "usr_FreeRTOS.h"
    
 /* Exported types ------------------------------------------------------------*/

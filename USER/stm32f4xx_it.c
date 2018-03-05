@@ -31,8 +31,14 @@
 #include "stm32f4xx_it.h"
 #include <string.h>
 
-#include "usart.h"
 
+#include "usart1.h"
+#include "usart2.h"
+#include "usart3.h"
+#include "usart4.h"
+#include "usart5.h"
+#include "usart6.h"
+#include "usr_FreeRTOS.h"
 #include "math.h"
 
 /** @addtogroup STM32F4xx_StdPeriph_Examples
@@ -194,14 +200,105 @@ void TIM3_IRQHandler(void)
   }
 }
 
-//void USART1_IRQHandler(void)
-//{
-//	if(USART_GetITStatus(USART1, USART_IT_IDLE) != RESET)
-//	{  
-//    USART1->SR;
-//    USART1->DR;	
-//	}
-//}
+extern uint8_t USART1_Rx_Buffer[USART1_Rx_BufferSize];
+extern uint8_t USART2_Rx_Buffer[USART2_Rx_BufferSize];
+extern uint8_t USART3_Rx_Buffer[USART3_Rx_BufferSize];
+extern uint8_t UART4_Rx_Buffer[UART4_Rx_BufferSize];
+extern uint8_t UART5_Rx_Buffer[UART4_Rx_BufferSize];
+extern uint8_t USART6_Rx_Buffer[USART6_Rx_BufferSize];
+
+extern SemaphoreHandle_t usart1_Semaphore_bin;
+extern SemaphoreHandle_t usart2_Semaphore_bin;
+
+
+void USART1_IRQHandler(void)
+{ 
+	if(USART_GetITStatus(USART1, USART_IT_IDLE) != RESET)
+	{  
+    USART1->SR;
+    USART1->DR;	
+      
+    USART1_Send_bin(USART1_Rx_Buffer,USART1_GetReceiveDataNumber());     
+    
+    USART1_Reset_RX();
+	}
+}
+
+void USART2_IRQHandler(void)
+{ 
+  BaseType_t HighPriorityTaskToken = pdTRUE;
+  
+	if(USART_GetITStatus(USART2, USART_IT_IDLE) != RESET)
+	{  
+    USART2->SR;
+    USART2->DR;	
+      
+    USART2_Send_bin(USART2_Rx_Buffer,USART2_GetReceiveDataNumber());
+
+    USART2_Reset_RX();    
+	}
+  
+  if(USART_GetITStatus(USART2, USART_IT_TC) != RESET)
+	{  
+    USART_ClearITPendingBit(USART2,USART_IT_TC);  
+    
+    xSemaphoreGiveFromISR(usart2_Semaphore_bin,&HighPriorityTaskToken);
+    
+    
+	}
+}
+
+void USART3_IRQHandler(void)
+{ 
+	if(USART_GetITStatus(USART3, USART_IT_IDLE) != RESET)
+	{  
+    USART3->SR;
+    USART3->DR;	
+      
+    USART3_Send_data(USART3_Rx_Buffer,USART3_GetReceiveDataNumber());     
+    
+    USART3_Reset_RX();
+	}
+}
+
+void UART4_IRQHandler(void)
+{ 
+	if(USART_GetITStatus(UART4, USART_IT_IDLE) != RESET)
+	{  
+    UART4->SR;
+    UART4->DR;	
+      
+    UART4_Send_data(UART4_Rx_Buffer,UART4_GetReceiveDataNumber());     
+    
+    UART4_Reset_RX();
+	}
+}
+
+void UART5_IRQHandler(void)
+{ 
+	if(USART_GetITStatus(UART5, USART_IT_IDLE) != RESET)
+	{  
+    UART5->SR;
+    UART5->DR;	
+      
+    UART5_Send_data(UART5_Rx_Buffer,UART5_GetReceiveDataNumber());     
+    
+    UART5_Reset_RX();
+	}
+}
+
+void USART6_IRQHandler(void)
+{ 
+	if(USART_GetITStatus(USART6, USART_IT_IDLE) != RESET)
+	{  
+    USART6->SR;
+    USART6->DR;	
+      
+    USART6_Send_data(USART6_Rx_Buffer,USART6_GetReceiveDataNumber());     
+    
+    USART6_Reset_RX();
+	}
+}
 
 
 /******************************************************************************/
