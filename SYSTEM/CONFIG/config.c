@@ -27,12 +27,12 @@
 /*============================================================================*/
 void USART_Init_Usr()
 {
-   USART1_Init(9600,USART_IT_IDLE,ENABLE);
-   USART2_Init(9600,USART_IT_IDLE|USART_IT_TC,ENABLE);
-   USART3_Init(9600,USART_IT_IDLE,ENABLE);
-   UART4_Init(9600,USART_IT_IDLE,ENABLE);
-   UART5_Init(9600,USART_IT_IDLE,ENABLE);
-   USART6_Init(9600,USART_IT_IDLE,ENABLE);
+//   USART1_Init(9600,USART_IT_IDLE,ENABLE);
+   USART2_Init(230400,USART_IT_IDLE | USART_IT_TC,ENABLE);
+//   USART3_Init(9600,USART_IT_IDLE | USART_IT_TC,ENABLE);
+//   UART4_Init(9600,USART_IT_IDLE,ENABLE);
+   UART5_Init(115200,USART_IT_IDLE | USART_IT_TC,ENABLE);
+//   USART6_Init(9600,USART_IT_IDLE,ENABLE);
 }
 
 TpVoid NVIC_Config(TpVoid)
@@ -40,42 +40,20 @@ TpVoid NVIC_Config(TpVoid)
 	NVIC_InitTypeDef NVIC_InitStructure;
 	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-	
-  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-  
+	 
   NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 8;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
   
-  NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
-  
-  NVIC_InitStructure.NVIC_IRQChannel = UART4_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
   
   NVIC_InitStructure.NVIC_IRQChannel = UART5_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 8;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
-  
-  NVIC_InitStructure.NVIC_IRQChannel = USART6_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x02;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+
 }
 
 

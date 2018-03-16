@@ -1,30 +1,34 @@
 #include "usr_FreeRTOS.h"
-
+#include "usart_FreeRTOS.h"
+#include "usart2.h"
 #include "config.h"
 #include "stm32f4xx_it.h"
+#include "GNSS.h"
+#include "LED.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
+/*创建互斥信号量，防止printf任务间，重入*/
+SemaphoreHandle_t  u2_printf_sema_bin = NULL;
 
 void TaskCreatUser(void);
 void TaskGroupCreat(void);
 void SemaphoreCreat(void);
-uint8_t send_bf[100] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ\r\n";
-
+void QueueCreat(void);
 TpInt32 main(TpVoid)
 {
-//  __set_PRIMASK(1);
+  __set_PRIMASK(1);
   /* 创建任务*/
 
   HardWareInit(); 
+   
+  SemaphoreCreat();
+  QueueCreat();
+  TaskCreatUser();
 
-//  SemaphoreCreat();
-//  TaskCreatUser();
-//  TaskGroupCreat();
-
-//  /* 启动调度，开始执行任务 */
-//  vTaskStartScheduler();
+  /* 启动调度，开始执行任务 */
+  vTaskStartScheduler();
   /*
    系统不会运行到这里，
    如果运行到这里，有可能是堆空间不够使用导致
@@ -38,8 +42,6 @@ TickType_t  uxArraySize;
 TickType_t  uxArraySizer;
 TaskStatus_t task_status[8];
 TickType_t  ulTotalRunTime;
-
-
 
 void Taskappstatus(void* pv)
 {  
@@ -55,73 +57,100 @@ void Taskappstatus(void* pv)
 		  /*获取每个任务的状态信息 */  
       uxArraySizer = uxTaskGetSystemState( task_status, uxArraySize,&ulTotalRunTime );  
 		
-//      u1_printf("系统运行时间： %d秒\r\n");/*输出运行时间*/
-
-
-      vTaskDelayUntil(&xLastSYSTime, 1000);/*精准延时*/
-  }
-}
-
-/*-----------------------TaskStart---------------------------*/
-TaskHandle_t HandleTaskStart = NULL;
-void TaskStart(void* pv)
-{  
-  static uint32_t time_count;
-
-  TickType_t xLastSYSTime;
-  
-  xLastSYSTime = xTaskGetTickCount();/*读取此时时间*/
-  
-  while(1)
-  {
-      time_count++;
-    
-//      u1_printf("系统运行时间： %d秒\r\n",time_count);/*输出运行时间*/
+      USART_printf_RTOS(USART2,"系统运行时间： %d秒\r\n",xLastSYSTime);
 
       vTaskDelayUntil(&xLastSYSTime, 1000);/*精准延时*/
   }
 }
-/*-----------------------TaskTCPClient1---------------------------*/
-TaskHandle_t HandleTaskTCPClient1 = NULL;
-void TaskTCPClient1(void* pv)
-{  
-  while(1)
-  {
-     vTaskDelay(1000);
-  }
-}
 
-/*-----------------------TaskMainTcp---------------------------*/
-TaskHandle_t HandleTaskMainTcp = NULL;
-void TaskMainTcp(void* pv)
-{  
-  while(1)
-  {
-    
-  }
-}
 
-/*-----------------------TaskTCPClient2---------------------------*/
-TaskHandle_t HandleTaskTCPServer = NULL;
-void TaskTCPServer(void* pv)
+
+/*-----------------------rev  GNSS---------------------------*/
+TaskHandle_t HandleTaskRevGNSS = NULL;
+void TaskRevGNSS(void* pv)
 {  
-  while(1)
-  {
-    
-  }
-}
-/*-----------------------TaskSysTcik---------------------------*/
-TaskHandle_t HandleTaskSysTcik = NULL;
-void TaskSysTcik(void* pv)
-{  
-  TickType_t xLastSYSTime;
+  BaseType_t result = 0;  
+  USART_gnss_queue_struct Gnss_Rx_struct;
   
-  xLastSYSTime = xTaskGetTickCount();/*读取此时时间*/
+  stGnssIn m_stGnssIn;
+  stGnssOut m_stGnssOut;
+  GnssOutPut gnss_out_data;
   
   while(1)
   {
+    result = xQueueReceive(uart5_queue,&Gnss_Rx_struct,portMAX_DELAY);
+    
+    if(result == pdTRUE)
+    {        
+//   USART_Send_bin_RTOS(USART2,U5_Rx_Buff.buff,U5_Rx_Buff.buff_num);     
+      Package_Rec(Gnss_Rx_struct.rx_buff,Gnss_Rx_struct.rx_num, &m_stGnssIn);
+      Combain_GNSS(&m_stGnssIn, &m_stGnssOut);
+        
+      if((m_stGnssOut.u16Flag & 0x0001) == 0x0001) /*lock the position*/
+      {
+        gnss_out_data.head = 0xFEDC;
+        
+        gnss_out_data.week_num    = m_stGnssOut.u16Week;
+        gnss_out_data.week_second = m_stGnssOut.u32UTC;
+        gnss_out_data.lon         = m_stGnssOut.dLongitude; 
+        gnss_out_data.lat         = m_stGnssOut.dLatitude; 
+        gnss_out_data.alt         = m_stGnssOut.fAltitude;
+        gnss_out_data.flag        = m_stGnssOut.u16Flag;
+        gnss_out_data.spd         = m_stGnssOut.fVgroud;
+        gnss_out_data.heading     = m_stGnssOut.fHeading;
+        gnss_out_data.hdop        = m_stGnssOut.hdop;
+        gnss_out_data.orient      = m_stGnssOut.fAzi;
+        gnss_out_data.check       = CheckSumByte((TpUchar*)&gnss_out_data,sizeof(gnss_out_data));	
 
-    vTaskDelayUntil(&xLastSYSTime, 100);/*精准延时*/
+        USART_Send_bin_RTOS(USART_nav,(uint8_t*)&gnss_out_data,sizeof(gnss_out_data));       
+        
+        if((m_stGnssOut.u16Flag & GNSS_FIXED) == GNSS_FIXED)
+        {
+          LED_SetState(LEDPin1, LEDStateOn);
+          LED_SetState(LEDPin2, LEDStateOff);
+        }
+        else
+        {
+          LED_SetState(LEDPin1, LEDStateOff);
+          LED_SetState(LEDPin2, LEDStateOn);
+        }
+      }
+    }
+  }
+}
+
+TaskHandle_t HandleTaskRevNav = NULL;
+void TaskRevNav(void* pv)
+{
+  BaseType_t result = 0;
+  USART_nav_queue_struct  nav_rx_struct;
+  
+  while(1)
+  {    
+    result = xQueueReceive(usart2_queue,&nav_rx_struct,portMAX_DELAY);
+    
+    if(result == pdTRUE)
+    {
+      USART_Send_bin_RTOS(USART_usr,nav_rx_struct.rx_buff,nav_rx_struct.rx_num);
+    }
+  }
+}
+
+/*-----------------------rev  usr---------------------------*/
+TaskHandle_t HandleTaskRevUsr = NULL;
+void TaskRevUsr(void* pv)
+{  
+  BaseType_t result = 0;
+  Usart2_queue_struct U2_Rx_Buff;
+ 
+  while(1)
+  {    
+    result = xQueueReceive(usart2_queue,&U2_Rx_Buff,portMAX_DELAY);
+    
+    if(result == pdTRUE)
+    {
+      USART_Send_bin_RTOS(USART_usr,U2_Rx_Buff.rx_buff,U2_Rx_Buff.rx_num);
+    }
   }
 }
 
@@ -129,54 +158,45 @@ void TaskSysTcik(void* pv)
 
 void TaskCreatUser(void)
 { 
-   xTaskCreate( Taskappstatus,         /* 任务函数 */
-               "Taskappstatus",       /* 任务名    */
-               500,               /* 任务栈大小，单位：4字节 */
-               NULL,              /* 任务参数  */
-               1,                 /* 任务优先级*/
+  xTaskCreate( Taskappstatus,         /* 实时打印任务状态*/
+               "Taskappstatus",       /* 任务名*/
+               500,                   /* 任务栈大小，单位：4字节 */
+               NULL,                  /* 任务参数  */
+               1,                     /* 任务优先级*/
                &HandleTaskappstatus); /* 任务句柄  */
-	
-  xTaskCreate( TaskStart,         /* 任务函数 */
-               "TaskStart",       /* 任务名    */
-               100,               /* 任务栈大小，单位：4字节 */
-               NULL,              /* 任务参数  */
-               1,                 /* 任务优先级*/
-               &HandleTaskStart); /* 任务句柄  */
   
-  xTaskCreate( TaskTCPClient1,         /* 任务函数 */
-               "TaskTCPClient1",       /* 任务名    */
-               500,               		 /* 任务栈大小，单位：4字节 */
-               NULL,              		 /* 任务参数  */
-               1,                 		 /* 任务优先级*/
-               &HandleTaskTCPClient1); /* 任务句柄  */
-  
-  xTaskCreate( TaskTCPServer,         /* 任务函数 */
-							 "TaskTCPServer",       /* 任务名    */
-							 1024,                  /* 任务栈大小，单位：4字节 */
-							 NULL,                  /* 任务参数  */
-							 1,                     /* 任务优先级*/
-							 &HandleTaskTCPServer); /* 任务句柄  */
-  
-  xTaskCreate( TaskMainTcp,         	/* 任务函数 */
-               "TaskTCPClient2",      /* 任务名    */
-               100,               			/* 任务栈大小，单位：4字节 */
+  xTaskCreate( TaskRevGNSS,         	/* 接收arm2数据，并将数据输出到arm2上 */
+               "TaskRevGNSS",         /* 任务名    */
+               1024,               		/* 任务栈大小，单位：4字节 */
                NULL,              		/* 任务参数  */
-               2,                 		/* 任务优先级*/
-               &HandleTaskMainTcp); 	/* 任务句柄  */
+               0,                 		/* 任务优先级*/
+               &HandleTaskRevGNSS); 	/* 任务句柄  */
   
-  xTaskCreate( TaskSysTcik,         	/* 任务函数 */
-               "TaskSysTime",       	/* 任务名    */
-               100,               			/* 任务栈大小，单位：4字节 */
+  xTaskCreate( TaskRevNav,         	/* 任务函数 */
+               "TaskRevNav",       	/* 任务名    */
+               1024,               			/* 任务栈大小，单位：4字节 */
                NULL,              		/* 任务参数  */
                3,                 		/* 任务优先级*/
-               &HandleTaskSysTcik); 	/* 任务句柄  */
+               &HandleTaskRevNav); 	/* 任务句柄  */
+  
+  xTaskCreate( TaskRevUsr,         	/* 任务函数 */
+               "TaskRevUsr",       	/* 任务名    */
+               1024,               			/* 任务栈大小，单位：4字节 */
+               NULL,              		/* 任务参数  */
+               3,                 		/* 任务优先级*/
+               &HandleTaskRevUsr); 	/* 任务句柄  */
 }
 
-/*创建互斥信号量，防止u1_printf任务间，重入*/
-SemaphoreHandle_t  xMutex = NULL;
+/*信号量创建*/
 void SemaphoreCreat(void)
 {
-  xMutex = xSemaphoreCreateMutex();
+    Usart_FreeRTOS_Semaphore_init();
+}
+
+/*消息队列创建*/
+void QueueCreat(void)
+{
+    Usart_FreeRTOS_Queue_init();
 }
 
 /*创建事件标志组，提高RL效率，及时调用main_TcpNet();*/

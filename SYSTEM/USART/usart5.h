@@ -7,8 +7,8 @@
 
 #define NO_USART_IRQ                 NULL
 
-#define UART5_Tx_BufferSize         512
-#define UART5_Rx_BufferSize         512
+#define UART5_Tx_BufferSize         1024
+#define UART5_Rx_BufferSize         1024
 
 /****************************************************************
                         UART5 IO config 
@@ -39,6 +39,6 @@ void UART5_Reset_RX(void);
 
 uint16_t UART5_GetReceiveDataNumber(void);
 
-void UART5_Send_data(uint8_t* out_buff,uint16_t out_size);
-void UART5_Send_data_idle(void);
+void USART5_Send_bin(uint8_t* out_buff,uint16_t out_size);
+
 #endif

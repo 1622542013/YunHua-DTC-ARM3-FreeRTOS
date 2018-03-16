@@ -141,13 +141,6 @@ void UART5_DMA_Config(FunctionalState NewState)
 
   DMA_Init(UART5_TX_DMA_Source, &DMA_InitStructure);
   DMA_Cmd(UART5_TX_DMA_Source, ENABLE);
-
-/* Starting a byte of data to make a DMA transmission completion flag */
-  DMA_ClearFlag(UART5_TX_DMA_Source, UART5_TX_DMA_flag);  /* Clear Pending DMA channel x flag (DMA2 Stream7 transfer completion flag) */
-  DMA_Cmd(UART5_TX_DMA_Source, DISABLE);
-  while(DMA_GetCmdStatus(UART5_TX_DMA_Source) != DISABLE);
-  DMA_SetCurrDataCounter(UART5_TX_DMA_Source, 1);
-  DMA_Cmd(UART5_TX_DMA_Source, ENABLE);
    
 /*----------------------  DMA RX  -----------------------------*/ 
   USART_DMACmd(UART5, USART_DMAReq_Rx, ENABLE);
@@ -191,8 +184,6 @@ void UART5_Init(uint32_t BaudRate,uint16_t USART_irq_mode,FunctionalState Dma_sw
 
 void UART5_DMA_Send(uint8_t* send_buff,uint16_t send_size)
 {
-  while(DMA_GetFlagStatus(UART5_TX_DMA_Source, UART5_TX_DMA_flag)==0);
-
   memcpy(UART5_Tx_Buffer, send_buff, send_size); /* Copy memory */
   
   DMA_ClearFlag(UART5_TX_DMA_Source, UART5_TX_DMA_flag);  /* Clear Pending DMA channel x flag (DMA2 Stream7 transfer completion flag) */
@@ -226,7 +217,22 @@ void UART5_Reset_RX(void)
 
 /*-------------------------------------  USART app  ------------------------------------------*/
 
-void UART5_Send_data(uint8_t* out_buff,uint16_t out_size)
+void USART5_Send_bin(uint8_t* out_buff,uint16_t out_size)
 {  
    UART5_DMA_Send(out_buff,out_size);  
+}
+
+#include <stdarg.h>
+#include <stdio.h>
+
+void USART5_printf(char* fmt,...)  
+{  
+  char buff[UART5_Tx_BufferSize] = {0};
+  
+  va_list ap;
+  va_start(ap,fmt);
+  vsprintf((char*)buff,fmt,ap);
+  va_end(ap);
+
+  USART5_Send_bin((uint8_t*)buff, strlen(buff)); 
 }

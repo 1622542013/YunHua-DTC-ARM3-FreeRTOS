@@ -62,6 +62,8 @@ void USART2_Irq_Config(uint16_t USART_irq_mode)
   if( (USART_irq_mode & USART_IT_TC) == USART_IT_TC )
   {
     USART_ITConfig(USART2, USART_IT_TC, ENABLE); /* Enabling interrupts specified USART2 */
+    
+   // USART2 ->CR1 &=~ USART_CR1_TCIE;/*防止初始化时，误触发发送完成中断*/
   }
   if( (USART_irq_mode & USART_IT_RXNE) == USART_IT_RXNE )
   {
@@ -141,14 +143,7 @@ void USART2_DMA_Config(FunctionalState NewState)
 
   DMA_Init(USART2_TX_DMA_Source, &DMA_InitStructure);
   DMA_Cmd(USART2_TX_DMA_Source, ENABLE);
-
-/* Starting a byte of data to make a DMA transmission completion flag */
-  DMA_ClearFlag(USART2_TX_DMA_Source, USART2_TX_DMA_flag);  /* Clear Pending DMA channel x flag (DMA2 Stream7 transfer completion flag) */
-  DMA_Cmd(USART2_TX_DMA_Source, DISABLE);
-  while(DMA_GetCmdStatus(USART2_TX_DMA_Source) != DISABLE);
-  DMA_SetCurrDataCounter(USART2_TX_DMA_Source, 1);
-  DMA_Cmd(USART2_TX_DMA_Source, ENABLE);
-   
+ 
 /*----------------------  DMA RX  -----------------------------*/ 
   USART_DMACmd(USART2, USART_DMAReq_Rx, ENABLE);
 
@@ -191,8 +186,6 @@ void USART2_Init(uint32_t BaudRate,uint16_t USART_irq_mode,FunctionalState Dma_s
 
 void USART2_DMA_Send(uint8_t* send_buff,uint16_t send_size)
 {
-  while(DMA_GetFlagStatus(USART2_TX_DMA_Source, USART2_TX_DMA_flag)==0);
-
   memcpy(USART2_Tx_Buffer, send_buff, send_size); /* Copy memory */
   
   DMA_ClearFlag(USART2_TX_DMA_Source, USART2_TX_DMA_flag);  /* Clear Pending DMA channel x flag (DMA2 Stream7 transfer completion flag) */
@@ -227,7 +220,7 @@ void USART2_Reset_RX(void)
 /*-------------------------------------  USART app  ------------------------------------------*/
 
 void USART2_Send_bin(uint8_t* out_buff,uint16_t out_size)
-{  
+{   
    USART2_DMA_Send(out_buff,out_size);  
 }
 
@@ -235,10 +228,8 @@ void USART2_Send_bin(uint8_t* out_buff,uint16_t out_size)
 #include <stdio.h>
 
 void USART2_printf(char* fmt,...)  
-{ 
-  static char buff[USART2_Tx_BufferSize];
-
-  memset(buff,0,USART2_Tx_BufferSize);
+{  
+  char buff[USART2_Tx_BufferSize] = {0};
   
   va_list ap;
   va_start(ap,fmt);

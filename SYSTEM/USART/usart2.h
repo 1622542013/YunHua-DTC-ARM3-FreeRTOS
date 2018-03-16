@@ -48,6 +48,8 @@
 
 /*====================================================================================*/
 
+#define UASRT2_Last_Send_Over()      UASRT2_Last_Send_Over_while()              
+
 void USART2_Init(uint32_t BaudRate,uint16_t USART_irq_mode,FunctionalState Dma_swtich);
 void USART2_DMA_Send(uint8_t* send_buff,uint16_t send_size);
 void USART2_Reset_RX(void);
