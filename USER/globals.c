@@ -29,7 +29,7 @@ uint32_t ulHighFrequencyTimerTicks = 0;
 /*                              Global functions                              */
 /*============================================================================*/
 
-short int CheckSum(unsigned char *pinf, int len)
+uint16_t CheckSum(unsigned char *pinf, int len)
 {
   unsigned short ss = 0;
   unsigned char  c1 = 0;

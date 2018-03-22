@@ -33,13 +33,14 @@ QueueHandle_t uart4_queue = NULL;
 QueueHandle_t uart5_queue = NULL;
 QueueHandle_t usart6_queue = NULL;
 
-Usart2_queue_struct u2_queue;
-Uart5_queue_struct u5_queue;
+usart2_queue_struct u2_queue;
+usart3_queue_struct u3_queue;
+uart5_queue_struct u5_queue;
 
 void Usart_FreeRTOS_Queue_init(void)
 {
-//  usart1_queue = xQueueCreate(1,USART1_Tx_BufferSize);
   usart2_queue = xQueueCreate(1,sizeof(u2_queue));
+  usart3_queue = xQueueCreate(1,sizeof(u3_queue));
   uart5_queue = xQueueCreate(1,sizeof(u5_queue));
 }
 
@@ -61,6 +62,12 @@ void USART_Send_bin_RTOS(USART_TypeDef* USARTx,uint8_t* out_buff,uint16_t out_si
   {
     xSemaphoreTake(uart5_Semaphore_bin,portMAX_DELAY);
     USART5_Send_bin(out_buff,out_size);
+  }
+  
+  if(USARTx == USART6)
+  {
+    xSemaphoreTake(usart6_Semaphore_bin,portMAX_DELAY);
+    USART6_Send_data(out_buff,out_size);
   }
 }
 

@@ -1,3 +1,26 @@
+/*
+                           _ooOoo_
+                          o8888888o
+                          88" . "88
+                          (| -_- |)
+                          O\  =  /O
+                       ____/`---'\____
+                     .'  \\|     |//  `.
+                    /  \\|||  :  |||//  \
+                   /  _||||| -:- |||||-  \
+                   |   | \\\  -  /// |   |
+                   | \_|  ''\---/''  |   |
+                   \  .-\__  `-`  ___/-. /
+                 ___`. .'  /--.--\  `. . __
+              ."" '<  `.___\_<|>_/___.'  >'"".
+             | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+             \  \ `-.   \_ __\ /__ _/   .-` /  /
+        ======`-.____`-.___\_____/___.-`____.-'======
+                           `=---='
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                 佛祖保佑       永无BUG
+*/
+
 #include "usr_FreeRTOS.h"
 #include "usart_FreeRTOS.h"
 #include "usart2.h"
@@ -8,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "nav_decode.h"
 
 /*创建互斥信号量，防止printf任务间，重入*/
 SemaphoreHandle_t  u2_printf_sema_bin = NULL;
@@ -18,6 +42,8 @@ void SemaphoreCreat(void);
 void QueueCreat(void);
 TpInt32 main(TpVoid)
 {
+  NVIC_SetVectorTable(FLASH_BASE, 0x20000);
+
   __set_PRIMASK(1);
   /* 创建任务*/
 
@@ -45,19 +71,19 @@ TickType_t  ulTotalRunTime;
 
 void Taskappstatus(void* pv)
 {  
-  TickType_t xLastSYSTime;
+  TickType_t xLastSYSTime = 0;
 
   xLastSYSTime = xTaskGetTickCount();/*读取此时时间*/
 	
-	 /* 获取任务总数目*/  
-  uxArraySize = uxTaskGetNumberOfTasks ();  
+//	 /* 获取任务总数目*/  
+//  uxArraySize = uxTaskGetNumberOfTasks ();  
   
   while(1)
   {
-		  /*获取每个任务的状态信息 */  
-      uxArraySizer = uxTaskGetSystemState( task_status, uxArraySize,&ulTotalRunTime );  
-		
-      USART_printf_RTOS(USART2,"系统运行时间： %d秒\r\n",xLastSYSTime);
+//		  /*获取每个任务的状态信息 */  
+//      uxArraySizer = uxTaskGetSystemState( task_status, uxArraySize,&ulTotalRunTime );  
+    
+      USART_printf_RTOS(USART2,"系统运行时间： %d毫秒\r\n",xLastSYSTime);
 
       vTaskDelayUntil(&xLastSYSTime, 1000);/*精准延时*/
   }
@@ -70,19 +96,18 @@ TaskHandle_t HandleTaskRevGNSS = NULL;
 void TaskRevGNSS(void* pv)
 {  
   BaseType_t result = 0;  
-  USART_gnss_queue_struct Gnss_Rx_struct;
+  USART_gnss_queue_struct Gnss_Rx_struct = {0};
   
-  stGnssIn m_stGnssIn;
-  stGnssOut m_stGnssOut;
-  GnssOutPut gnss_out_data;
+  stGnssIn m_stGnssIn = {0};
+  static stGnssOut m_stGnssOut= {0};
+  GnssOutPut gnss_out_data= {0};
   
   while(1)
   {
     result = xQueueReceive(uart5_queue,&Gnss_Rx_struct,portMAX_DELAY);
     
     if(result == pdTRUE)
-    {        
-//   USART_Send_bin_RTOS(USART2,U5_Rx_Buff.buff,U5_Rx_Buff.buff_num);     
+    {           
       Package_Rec(Gnss_Rx_struct.rx_buff,Gnss_Rx_struct.rx_num, &m_stGnssIn);
       Combain_GNSS(&m_stGnssIn, &m_stGnssOut);
         
@@ -100,7 +125,7 @@ void TaskRevGNSS(void* pv)
         gnss_out_data.heading     = m_stGnssOut.fHeading;
         gnss_out_data.hdop        = m_stGnssOut.hdop;
         gnss_out_data.orient      = m_stGnssOut.fAzi;
-        gnss_out_data.check       = CheckSumByte((TpUchar*)&gnss_out_data,sizeof(gnss_out_data));	
+        gnss_out_data.check       = CheckSumByte((TpUchar*)&gnss_out_data,sizeof(gnss_out_data));	       
 
         USART_Send_bin_RTOS(USART_nav,(uint8_t*)&gnss_out_data,sizeof(gnss_out_data));       
         
@@ -114,6 +139,13 @@ void TaskRevGNSS(void* pv)
           LED_SetState(LEDPin1, LEDStateOff);
           LED_SetState(LEDPin2, LEDStateOn);
         }
+        
+        memset(&m_stGnssOut,0,sizeof(m_stGnssOut));
+      }
+      else
+      {
+          LED_SetState(LEDPin1, LEDStateOff);
+          LED_SetState(LEDPin2, LEDStateOff);
       }
     }
   }
@@ -123,15 +155,16 @@ TaskHandle_t HandleTaskRevNav = NULL;
 void TaskRevNav(void* pv)
 {
   BaseType_t result = 0;
-  USART_nav_queue_struct  nav_rx_struct;
+  uint8_t    decode_result = 0;
+  USART_nav_queue_struct  nav_rx_struct = {0};
   
   while(1)
   {    
-    result = xQueueReceive(usart2_queue,&nav_rx_struct,portMAX_DELAY);
+    result = xQueueReceive(USART_nav_queue_handle,&nav_rx_struct,portMAX_DELAY);
     
     if(result == pdTRUE)
     {
-      USART_Send_bin_RTOS(USART_usr,nav_rx_struct.rx_buff,nav_rx_struct.rx_num);
+       decode_nav(nav_rx_struct.rx_buff,nav_rx_struct.rx_num); 
     }
   }
 }
@@ -141,16 +174,44 @@ TaskHandle_t HandleTaskRevUsr = NULL;
 void TaskRevUsr(void* pv)
 {  
   BaseType_t result = 0;
-  Usart2_queue_struct U2_Rx_Buff;
+  USART_usr_queue_struct USR_Rx_Buff = {0};
  
   while(1)
-  {    
-    result = xQueueReceive(usart2_queue,&U2_Rx_Buff,portMAX_DELAY);
+  {       
+    result = xQueueReceive(USART_usr_queue_handle,&USR_Rx_Buff,portMAX_DELAY);
     
     if(result == pdTRUE)
     {
-      USART_Send_bin_RTOS(USART_usr,U2_Rx_Buff.rx_buff,U2_Rx_Buff.rx_num);
+      USART_Send_bin_RTOS(USART_usr,USR_Rx_Buff.rx_buff,USR_Rx_Buff.rx_num);
     }
+  }
+}
+
+
+TaskHandle_t HandleTaskSendMessage = NULL;
+void TaskSendMessage(void* pv)
+{  
+  BaseType_t result = 0;
+  DtcArm2Data nav_data = {0};
+  
+  TickType_t xLastSYSTime = 0;
+  xLastSYSTime = xTaskGetTickCount();/*读取此时时间*/
+ 
+  while(1)
+  {    
+    result = xQueueReceive(nav_queue,&nav_data,1);
+    
+    if(result == pdTRUE)
+    {
+      USART_Send_bin_RTOS(USART_SD,(uint8_t *)&nav_data,sizeof(nav_data));
+      USART_printf_RTOS(USART2,"*****收到*****\r\n"); 
+    }
+    else
+    {
+      USART_printf_RTOS(USART2,"——————————没收到——————————\r\n");
+    }
+    
+    vTaskDelayUntil(&xLastSYSTime, SYSTEM_CYCLE);/*精准延时*/
   }
 }
 
@@ -160,31 +221,37 @@ void TaskCreatUser(void)
 { 
   xTaskCreate( Taskappstatus,         /* 实时打印任务状态*/
                "Taskappstatus",       /* 任务名*/
-               500,                   /* 任务栈大小，单位：4字节 */
+               512,                   /* 任务栈大小，单位：4字节 */
                NULL,                  /* 任务参数  */
                1,                     /* 任务优先级*/
                &HandleTaskappstatus); /* 任务句柄  */
   
   xTaskCreate( TaskRevGNSS,         	/* 接收arm2数据，并将数据输出到arm2上 */
                "TaskRevGNSS",         /* 任务名    */
-               1024,               		/* 任务栈大小，单位：4字节 */
+               512,               		/* 任务栈大小，单位：4字节 */
                NULL,              		/* 任务参数  */
-               0,                 		/* 任务优先级*/
+               2,                 		/* 任务优先级*/
                &HandleTaskRevGNSS); 	/* 任务句柄  */
   
   xTaskCreate( TaskRevNav,         	/* 任务函数 */
                "TaskRevNav",       	/* 任务名    */
-               1024,               			/* 任务栈大小，单位：4字节 */
+               512,               			/* 任务栈大小，单位：4字节 */
                NULL,              		/* 任务参数  */
-               3,                 		/* 任务优先级*/
+               2,                 		/* 任务优先级*/
                &HandleTaskRevNav); 	/* 任务句柄  */
   
   xTaskCreate( TaskRevUsr,         	/* 任务函数 */
                "TaskRevUsr",       	/* 任务名    */
+               512,               			/* 任务栈大小，单位：4字节 */
+               NULL,              		/* 任务参数  */
+               2,                 		/* 任务优先级*/
+               &HandleTaskRevUsr); 	/* 任务句柄  */
+  xTaskCreate( TaskSendMessage,         	/* 任务函数 */
+               "TaskSendMessage",       	/* 任务名    */
                1024,               			/* 任务栈大小，单位：4字节 */
                NULL,              		/* 任务参数  */
-               3,                 		/* 任务优先级*/
-               &HandleTaskRevUsr); 	/* 任务句柄  */
+               2,                 		/* 任务优先级*/
+               &HandleTaskSendMessage); 	/* 任务句柄  */
 }
 
 /*信号量创建*/
@@ -197,6 +264,7 @@ void SemaphoreCreat(void)
 void QueueCreat(void)
 {
     Usart_FreeRTOS_Queue_init();
+    NavDataQueueInit();
 }
 
 /*创建事件标志组，提高RL效率，及时调用main_TcpNet();*/

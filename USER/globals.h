@@ -79,7 +79,7 @@ extern "C"
 
 	
 TpUchar CheckSumByte(TpUchar* Buffer, TpUint16 Length);
-short int CheckSum(unsigned char *pinf, int len);
+uint16_t CheckSum(unsigned char *pinf, int len);
 void Delay_500ns(void);
 TpBool My_atoi(const char* buff,int32_t* num);
 #ifdef __cplusplus

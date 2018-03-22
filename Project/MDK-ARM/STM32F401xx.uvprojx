@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,__RTX</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\USER;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\NetWork-licheng;..\..\SYSTEM\LAN8720;..\..\Libraries\STM32F4xx_StdPeriph_Driver\STM32F4x7_ETH_Driver\inc;..\..\SYSTEM\Printf-usr;..\..\SYSTEM\TASK\TCP;..\..\SYSTEM\USART</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\USER;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\USART;..\..\SYSTEM\GNSS;..\..\SYSTEM\LED</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -458,6 +458,16 @@
               <FileName>usart6.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\SYSTEM\USART\usart6.c</FilePath>
+            </File>
+            <File>
+              <FileName>GNSS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\GNSS\GNSS.c</FilePath>
+            </File>
+            <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\LED\LED.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -618,11 +628,6 @@
               <FileName>stm32f4xx_wwdg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Libraries\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_wwdg.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4x7_eth.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\Libraries\STM32F4xx_StdPeriph_Driver\STM32F4x7_ETH_Driver\src\stm32f4x7_eth.c</FilePath>
             </File>
           </Files>
         </Group>

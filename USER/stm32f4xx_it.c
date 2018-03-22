@@ -201,45 +201,35 @@ void TIM3_IRQHandler(void)
   }
 }
 
-extern uint8_t USART1_Rx_Buffer[USART1_Rx_BufferSize];
-extern uint8_t USART2_Rx_Buffer[USART2_Rx_BufferSize];
-extern uint8_t USART3_Rx_Buffer[USART3_Rx_BufferSize];
-extern uint8_t UART4_Rx_Buffer[UART4_Rx_BufferSize];
-extern uint8_t UART5_Rx_Buffer[UART5_Rx_BufferSize];
-extern uint8_t USART6_Rx_Buffer[USART6_Rx_BufferSize];
-
 void USART1_IRQHandler(void)
 { 
 	if(USART_GetITStatus(USART1, USART_IT_IDLE) != RESET)
 	{  
     USART1->SR;
     USART1->DR;	
-      
-    USART1_Send_bin(USART1_Rx_Buffer,USART1_GetReceiveDataNumber());     
     
     USART1_Reset_RX();
 	}
 }
 
-
+/*-----------------receive user command--------------------*/
 void USART2_IRQHandler(void)
 { 
-  BaseType_t HighPriorityTaskToken = pdFALSE;
+  BaseType_t HighPriorityTaskToken = pdTRUE;
   
 	if(USART_GetITStatus(USART2, USART_IT_IDLE) != RESET)
 	{  
     USART2->SR;
     USART2->DR;	
-    
-    Usart2_queue_struct u2_buff;
-    uint32_t num = USART2_GetReceiveDataNumber();
-    
-    u2_buff.rx_num = num;
-    memcpy(u2_buff.rx_buff,USART2_Rx_Buffer,u2_buff.rx_num);
-    
-    xQueueSendFromISR(usart2_queue,u2_buff.rx_buff,&HighPriorityTaskToken);
-         
-    portYIELD_FROM_ISR(HighPriorityTaskToken);  
+
+    usart2_queue_struct  usr_buff;
+
+    usr_buff.rx_num = USART2_GetReceiveDataNumber(); /*received data number*/
+    memcpy(usr_buff.rx_buff,USART2_Rx_Buffer,usr_buff.rx_num); /*push data into queue*/
+
+    xQueueSendFromISR(usart2_queue,&usr_buff,&HighPriorityTaskToken);/*send the queue*/
+
+    portYIELD_FROM_ISR(HighPriorityTaskToken); /*context switch immediately*/
 
     USART2_Reset_RX();    
 	}
@@ -248,46 +238,43 @@ void USART2_IRQHandler(void)
 	{  
     USART_ClearITPendingBit(USART2,USART_IT_TC);  
     
+    HighPriorityTaskToken = pdFALSE;
     xSemaphoreGiveFromISR(usart2_Semaphore_bin,&HighPriorityTaskToken);
-    
+       
+    /*Not do  context switch immediately*/
     portYIELD_FROM_ISR(HighPriorityTaskToken);  
 	}
 }
 
+/*-------------------------rev nav data----------------------*/
 void USART3_IRQHandler(void)
-{ 
-	if(USART_GetITStatus(USART3, USART_IT_IDLE) != RESET)
-	{  
-    USART3->SR;
-    USART3->DR;	
-         
-    
-    USART3_Reset_RX();
-	}
-  
-  BaseType_t HighPriorityTaskToken = pdFALSE;
+{  
+  BaseType_t HighPriorityTaskToken = pdTRUE;
   
 	if(USART_GetITStatus(USART3, USART_IT_IDLE) != RESET)
 	{  
     USART3->SR;
     USART3->DR;	
     
-    Usart2_queue_struct u2_buff;
-    uint32_t num = USART2_GetReceiveDataNumber();
-    
-    u2_buff.rx_num = num;
-    memcpy(u2_buff.rx_buff,USART2_Rx_Buffer,u2_buff.rx_num);
-    
-    xQueueSendFromISR(usart2_queue,u2_buff.rx_buff,&HighPriorityTaskToken);
-         
-    portYIELD_FROM_ISR(HighPriorityTaskToken);  
+    usart3_queue_struct nav_buff;
 
-    USART2_Reset_RX();    
+    nav_buff.rx_num = USART3_GetReceiveDataNumber();/*received data number*/
+    memcpy(nav_buff.rx_buff,USART3_Rx_Buffer,nav_buff.rx_num);/*push data into queue*/
+
+    xQueueSendFromISR(usart3_queue,&nav_buff,&HighPriorityTaskToken);/*send the queue*/
+
+    portYIELD_FROM_ISR(HighPriorityTaskToken); /*context switch immediately*/
+
+    USART3_Reset_RX();    
 	}
   
   if(USART_GetITStatus(USART3, USART_IT_TC) != RESET)
 	{  
     USART_ClearFlag(USART3, USART_FLAG_TC);
+    
+    HighPriorityTaskToken = pdFALSE;/*Not do  context switch immediately*/
+    xSemaphoreGiveFromISR(usart3_Semaphore_bin,&HighPriorityTaskToken);
+    portYIELD_FROM_ISR(HighPriorityTaskToken); 
 	}
 }
 
@@ -304,48 +291,62 @@ void UART4_IRQHandler(void)
 	}
 }
 
+/*-------------------------rev gnss data----------------------*/
 void UART5_IRQHandler(void)
-{ 
-  BaseType_t HighPriorityTaskToken = pdFALSE;
+{   
+  BaseType_t HighPriorityTaskToken = pdTRUE;
   
 	if(USART_GetITStatus(UART5, USART_IT_IDLE) != RESET)
 	{  
     UART5->SR;
-    UART5->DR;	
+    UART5->DR;
     
-    Uart5_queue_struct u5_buff;
-    uint32_t num = UART5_GetReceiveDataNumber();
+    uart5_queue_struct gnss_buff;   
     
-    u5_buff.rx_num = num;
-    memcpy(u5_buff.rx_buff,UART5_Rx_Buffer,u5_buff.rx_num);
+    gnss_buff.rx_num = UART5_GetReceiveDataNumber();
+    memcpy(gnss_buff.rx_buff,UART5_Rx_Buffer,gnss_buff.rx_num);
      
-    xQueueSendFromISR(uart5_queue,u5_buff.rx_buff,&HighPriorityTaskToken);
+    xQueueSendFromISR(uart5_queue,&gnss_buff,&HighPriorityTaskToken);
          
-    portYIELD_FROM_ISR(HighPriorityTaskToken);  
+    portYIELD_FROM_ISR(HighPriorityTaskToken); /*context switch immediately*/
 
-    UART5_Reset_RX();    
+    UART5_Reset_RX();
 	}
   
   if(USART_GetITStatus(UART5, USART_IT_TC) != RESET)
 	{  
     USART_ClearITPendingBit(UART5,USART_IT_TC);  
     
-    xSemaphoreGiveFromISR(uart5_Semaphore_bin,&HighPriorityTaskToken);
+    HighPriorityTaskToken = pdFALSE;
     
+    xSemaphoreGiveFromISR(uart5_Semaphore_bin,&HighPriorityTaskToken);
+    /*Not do  context switch immediately*/
     portYIELD_FROM_ISR(HighPriorityTaskToken);  
 	}
 }
 
 void USART6_IRQHandler(void)
 { 
+  BaseType_t HighPriorityTaskToken = pdTRUE;
+  
 	if(USART_GetITStatus(USART6, USART_IT_IDLE) != RESET)
 	{  
     USART6->SR;
     USART6->DR;	
       
-    USART6_Send_data(USART6_Rx_Buffer,USART6_GetReceiveDataNumber());     
+  //  USART6_Send_data(USART6_Rx_Buffer,USART6_GetReceiveDataNumber());     
     
     USART6_Reset_RX();
+	}
+  
+  if(USART_GetITStatus(USART6, USART_IT_TC) != RESET)
+	{  
+    USART_ClearITPendingBit(USART6,USART_IT_TC);  
+    
+    HighPriorityTaskToken = pdFALSE;/*Not do  context switch immediately*/
+    xSemaphoreGiveFromISR(usart6_Semaphore_bin,&HighPriorityTaskToken);
+    portYIELD_FROM_ISR(HighPriorityTaskToken); 
+    
 	}
 }
 

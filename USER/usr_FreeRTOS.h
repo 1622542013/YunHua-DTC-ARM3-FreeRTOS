@@ -15,4 +15,6 @@
 #include "semphr.h"
 
 
+#define SYSTEM_CYCLE     10  /*10ms data cycle*/
+
 #endif
