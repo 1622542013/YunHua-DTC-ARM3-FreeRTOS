@@ -272,7 +272,7 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8000000</StartAddress>
+                <StartAddress>0x8020000</StartAddress>
                 <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,__RTX</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\USER;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\USART;..\..\SYSTEM\GNSS;..\..\SYSTEM\LED</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\SYSTEM\CONFIG;..\..\Libraries\FreeRTOS\include;..\..\Libraries\FreeRTOS\portable;..\..\USER;..\..\SYSTEM\USART;..\..\SYSTEM\DELAY;..\..\SYSTEM\SYSCLOCK;..\..\SYSTEM\TASK;..\..\SYSTEM\USART;..\..\SYSTEM\GNSS;..\..\SYSTEM\LED;..\..\SYSTEM\EVENT_MARK;..\..\SYSTEM\DateTime</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -414,6 +414,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\USER\usart_FreeRTOS.c</FilePath>
             </File>
+            <File>
+              <FileName>nav_decode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\USER\nav_decode.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -468,6 +473,16 @@
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\SYSTEM\LED\LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>event_mark.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\EVENT_MARK\event_mark.c</FilePath>
+            </File>
+            <File>
+              <FileName>DateTime.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\SYSTEM\DateTime\DateTime.c</FilePath>
             </File>
           </Files>
         </Group>

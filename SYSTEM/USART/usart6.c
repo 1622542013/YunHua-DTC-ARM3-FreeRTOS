@@ -226,7 +226,7 @@ void USART6_Reset_RX(void)
 
 /*-------------------------------------  USART app  ------------------------------------------*/
 
-void USART6_Send_data(uint8_t* out_buff,uint16_t out_size)
+void USART6_Send_bin(uint8_t* out_buff,uint16_t out_size)
 {  
    USART6_DMA_Send(out_buff,out_size);  
 }

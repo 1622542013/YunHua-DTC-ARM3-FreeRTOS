@@ -33,10 +33,11 @@
 #endif
 
 
-
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()    (ulHighFrequencyTimerTicks = 0ul)
 #define portGET_RUN_TIME_COUNTER_VALUE()            ulHighFrequencyTimerTicks
 #define configUSE_STATS_FORMATTING_FUNCTIONS        1
+
+#define INCLUDE_uxTaskGetStackHighWaterMark         1
 
 #define configUSE_PREEMPTION			1   /**< 使能抢占调度器 */
 #define configUSE_IDLE_HOOK				0   /**< 使能空闲钩子函数 */

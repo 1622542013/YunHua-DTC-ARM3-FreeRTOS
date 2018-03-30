@@ -18,6 +18,7 @@
 #include "usart5.h"
 #include "usart6.h"
 
+#include "event_mark.h"
 /*============================================================================*/
 /*                              Global variables                              */
 /*============================================================================*/
@@ -64,6 +65,18 @@ TpVoid NVIC_Config(TpVoid)
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 8;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+  
+  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 8;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x00;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 
 }
 
@@ -83,9 +96,9 @@ void TIM_Configuration(void)
 
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);           /* Enable TIM2 clock */
 
-  TIM_TimeBaseInitStructure.TIM_Prescaler = 1;                   /* Specifies the prescaler value used to divide the TIM clock. */
+  TIM_TimeBaseInitStructure.TIM_Prescaler = 167;                   /* Specifies the prescaler value used to divide the TIM clock. */
   TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;/* Specifies the counter mode */
-  TIM_TimeBaseInitStructure.TIM_Period = 18260;                  /* Reload value	approximate 20KHz */
+  TIM_TimeBaseInitStructure.TIM_Period = 99;                  /* Reload value	approximate 20KHz */
   TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStructure);
   TIM_ClearFlag(TIM3, TIM_FLAG_Update);
@@ -96,6 +109,10 @@ void TIM_Configuration(void)
 void HardWareInit(TpVoid)
 {
   USART_Init_Usr();
+  TIM_Configuration();
+  
+  EventMarkInit();
+  
   NVIC_Config();
 }
 

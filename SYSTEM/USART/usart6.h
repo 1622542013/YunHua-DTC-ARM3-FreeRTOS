@@ -63,6 +63,6 @@ void USART6_Reset_RX(void);
 
 uint16_t USART6_GetReceiveDataNumber(void);
 
-void USART6_Send_data(uint8_t* out_buff,uint16_t out_size);
-void USART6_Send_data_idle(void);
+void USART6_Send_bin(uint8_t* out_buff,uint16_t out_size);
+
 #endif

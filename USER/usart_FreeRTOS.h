@@ -53,7 +53,7 @@ extern QueueHandle_t usart6_queue;
 
 typedef struct
 {
-  uint8_t  rx_buff[USART2_Tx_BufferSize];
+   uint8_t  rx_buff[USART2_Tx_BufferSize];
   uint32_t rx_num;
 }usart2_queue_struct;
 

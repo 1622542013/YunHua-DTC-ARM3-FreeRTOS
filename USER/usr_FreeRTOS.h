@@ -17,4 +17,9 @@
 
 #define SYSTEM_CYCLE     10  /*10ms data cycle*/
 
+
+#define SD_TIME_OK_BIT   (1<<1)
+
+extern EventGroupHandle_t Event_group;
+
 #endif

@@ -41,6 +41,7 @@
 #include "usr_FreeRTOS.h"
 #include "usart_FreeRTOS.h"
 #include "math.h"
+#include "event_mark.h"
 
 /** @addtogroup STM32F4xx_StdPeriph_Examples
   * @{
@@ -160,6 +161,17 @@ void EXTI1_IRQHandler(void)
   }
 }
 
+void EXTI9_5_IRQHandler(void)
+{
+  if(EXTI_GetITStatus(EXTI_Line5) != RESET)
+  {
+    EXTI_ClearITPendingBit(EXTI_Line5); 
+	
+    KeyStateChange();
+		
+  }
+}
+
 void DMA2_Stream0_IRQHandler(void)
 {
   
@@ -193,10 +205,12 @@ void DMA1_Stream0_IRQHandler(void)
   * @param  None
   * @retval None
   */
+extern uint32_t ulHighFrequencyTimerTicks;
 void TIM3_IRQHandler(void)
 {
   if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
   {  
+    ulHighFrequencyTimerTicks ++;
     TIM_ClearITPendingBit(TIM3, TIM_IT_Update); 
   }
 }
@@ -238,10 +252,7 @@ void USART2_IRQHandler(void)
 	{  
     USART_ClearITPendingBit(USART2,USART_IT_TC);  
     
-    HighPriorityTaskToken = pdFALSE;
-    xSemaphoreGiveFromISR(usart2_Semaphore_bin,&HighPriorityTaskToken);
-       
-    /*Not do  context switch immediately*/
+    xSemaphoreGiveFromISR(usart2_Semaphore_bin,&HighPriorityTaskToken);   
     portYIELD_FROM_ISR(HighPriorityTaskToken);  
 	}
 }
@@ -272,7 +283,6 @@ void USART3_IRQHandler(void)
 	{  
     USART_ClearFlag(USART3, USART_FLAG_TC);
     
-    HighPriorityTaskToken = pdFALSE;/*Not do  context switch immediately*/
     xSemaphoreGiveFromISR(usart3_Semaphore_bin,&HighPriorityTaskToken);
     portYIELD_FROM_ISR(HighPriorityTaskToken); 
 	}
@@ -316,11 +326,8 @@ void UART5_IRQHandler(void)
   if(USART_GetITStatus(UART5, USART_IT_TC) != RESET)
 	{  
     USART_ClearITPendingBit(UART5,USART_IT_TC);  
-    
-    HighPriorityTaskToken = pdFALSE;
-    
+       
     xSemaphoreGiveFromISR(uart5_Semaphore_bin,&HighPriorityTaskToken);
-    /*Not do  context switch immediately*/
     portYIELD_FROM_ISR(HighPriorityTaskToken);  
 	}
 }
@@ -333,20 +340,22 @@ void USART6_IRQHandler(void)
 	{  
     USART6->SR;
     USART6->DR;	
-      
-  //  USART6_Send_data(USART6_Rx_Buffer,USART6_GetReceiveDataNumber());     
-    
+ 
+    if(strstr((char*)USART6_Rx_Buffer, "$cmd,Config,OK*ff") != 0)
+    {
+      xEventGroupSetBitsFromISR(Event_group,SD_TIME_OK_BIT,&HighPriorityTaskToken);
+      portYIELD_FROM_ISR(HighPriorityTaskToken);
+    }
+
     USART6_Reset_RX();
 	}
-  
+
   if(USART_GetITStatus(USART6, USART_IT_TC) != RESET)
 	{  
     USART_ClearITPendingBit(USART6,USART_IT_TC);  
     
-    HighPriorityTaskToken = pdFALSE;/*Not do  context switch immediately*/
     xSemaphoreGiveFromISR(usart6_Semaphore_bin,&HighPriorityTaskToken);
-    portYIELD_FROM_ISR(HighPriorityTaskToken); 
-    
+    portYIELD_FROM_ISR(HighPriorityTaskToken);    
 	}
 }
 

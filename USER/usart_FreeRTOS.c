@@ -58,6 +58,12 @@ void USART_Send_bin_RTOS(USART_TypeDef* USARTx,uint8_t* out_buff,uint16_t out_si
     USART2_Send_bin(out_buff,out_size);
   }
   
+  if(USARTx == USART3)
+  {
+    xSemaphoreTake(usart3_Semaphore_bin,portMAX_DELAY);
+    USART3_Send_bin(out_buff,out_size);
+  }
+  
   if(USARTx == UART5)
   {
     xSemaphoreTake(uart5_Semaphore_bin,portMAX_DELAY);
@@ -67,7 +73,7 @@ void USART_Send_bin_RTOS(USART_TypeDef* USARTx,uint8_t* out_buff,uint16_t out_si
   if(USARTx == USART6)
   {
     xSemaphoreTake(usart6_Semaphore_bin,portMAX_DELAY);
-    USART6_Send_data(out_buff,out_size);
+    USART6_Send_bin(out_buff,out_size);
   }
 }
 
@@ -112,6 +118,23 @@ void USART_printf_RTOS(USART_TypeDef* USARTx,char* fmt,...)
       va_end(ap);
 
       USART5_Send_bin((uint8_t*)buff, strlen(buff)); 
+    }
+  }
+  
+   if(USARTx == USART6)
+  {
+    result = xSemaphoreTake(usart6_Semaphore_bin,portMAX_DELAY);
+    
+    if(result == pdTRUE)
+    {  
+      char buff[USART6_Tx_BufferSize] = {0};
+      
+      va_list ap;
+      va_start(ap,fmt);
+      vsprintf((char*)buff,fmt,ap);
+      va_end(ap);
+
+      USART6_Send_bin((uint8_t*)buff, strlen(buff)); 
     }
   }
 }
